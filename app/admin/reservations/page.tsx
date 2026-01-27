@@ -36,6 +36,46 @@ export default function ReservationsPage() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDate, setFilterDate] = useState('');
 
+  const downloadExcel = () => {
+    if (reservations.length === 0) return;
+
+    // CSV headers
+    const headers = ['Fecha', 'Hora', 'Nombre', 'Email', 'Teléfono', 'Personas', 'Tipo de Mesa', 'Notas', 'Estado', 'Creada'];
+
+    // CSV rows
+    const rows = reservations.map(r => [
+      new Date(r.date).toLocaleDateString('es-MX'),
+      r.time,
+      r.name,
+      r.email,
+      r.phone,
+      r.guests.toString(),
+      r.table_type || 'general',
+      r.notes || '',
+      statusLabels[r.status] || r.status,
+      new Date(r.created_at).toLocaleString('es-MX')
+    ]);
+
+    // Build CSV content with BOM for Excel UTF-8 compatibility
+    const BOM = '\uFEFF';
+    const csvContent = BOM + [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const today = new Date().toISOString().split('T')[0];
+    link.download = `reservaciones_${today}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     fetchReservations();
   }, [filterStatus, filterDate]);
@@ -77,7 +117,19 @@ export default function ReservationsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-serif text-white mb-8">Reservaciones</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-serif text-white">Reservaciones</h1>
+        <button
+          onClick={downloadExcel}
+          disabled={reservations.length === 0}
+          className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Descargar Excel
+        </button>
+      </div>
 
       {/* Filters */}
       <div className="flex gap-4 mb-6">
