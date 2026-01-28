@@ -99,9 +99,10 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
 };
 
 // Animated Section Wrapper
-const AnimatedSection = ({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => {
+const AnimatedSection = ({ children, className = '', delay = 0, id }: { children: React.ReactNode; className?: string; delay?: number; id?: string }) => {
   return (
     <motion.section
+      id={id}
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
