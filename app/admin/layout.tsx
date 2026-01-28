@@ -8,6 +8,7 @@ const navItems = [
   { href: '/admin/reservations', label: 'Reservaciones', icon: '📅' },
   { href: '/admin/menu', label: 'Menú', icon: '🍸' },
   { href: '/admin/events', label: 'Eventos', icon: '🎵' },
+  { href: '/admin/hero', label: 'Imágenes Hero', icon: '🖼️' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

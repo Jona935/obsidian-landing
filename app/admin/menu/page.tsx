@@ -10,6 +10,7 @@ interface MenuItem {
   price: number;
   image_url: string;
   available: boolean;
+  featured: boolean;
 }
 
 const categories = [
@@ -33,6 +34,7 @@ export default function MenuPage() {
     price: '',
     image_url: '',
     available: true,
+    featured: false,
   });
 
   useEffect(() => {
@@ -61,6 +63,7 @@ export default function MenuPage() {
         price: item.price.toString(),
         image_url: item.image_url || '',
         available: item.available,
+        featured: item.featured || false,
       });
     } else {
       setEditingItem(null);
@@ -71,6 +74,7 @@ export default function MenuPage() {
         price: '',
         image_url: '',
         available: true,
+        featured: false,
       });
     }
     setShowModal(true);
@@ -117,6 +121,24 @@ export default function MenuPage() {
       if (res.ok) {
         setItems(prev =>
           prev.map(i => (i.id === item.id ? { ...i, available: !i.available } : i))
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const toggleFeatured = async (item: MenuItem) => {
+    try {
+      const res = await fetch('/api/menu', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: item.id, featured: !item.featured }),
+      });
+
+      if (res.ok) {
+        setItems(prev =>
+          prev.map(i => (i.id === item.id ? { ...i, featured: !i.featured } : i))
         );
       }
     } catch (error) {
@@ -183,10 +205,18 @@ export default function MenuPage() {
           {filteredItems.map((item) => (
             <div
               key={item.id}
-              className={`bg-zinc-900 border border-zinc-800 rounded-lg p-4 ${
-                !item.available ? 'opacity-50' : ''
+              className={`bg-zinc-900 border rounded-lg p-4 relative ${
+                !item.available ? 'opacity-50 border-zinc-800' : item.featured ? 'border-yellow-500/50' : 'border-zinc-800'
               }`}
             >
+              {/* Featured Star Badge */}
+              {item.featured && (
+                <div className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                  <span>⭐</span>
+                  <span className="font-medium">Home</span>
+                </div>
+              )}
+
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-white font-medium">{item.name}</h3>
                 <span className="text-white font-bold">${item.price}</span>
@@ -194,10 +224,12 @@ export default function MenuPage() {
               {item.description && (
                 <p className="text-zinc-500 text-sm mb-4">{item.description}</p>
               )}
-              <div className="flex items-center justify-between">
+
+              {/* Toggle buttons row */}
+              <div className="flex items-center gap-2 mb-3">
                 <button
                   onClick={() => toggleAvailable(item)}
-                  className={`text-sm px-3 py-1 rounded ${
+                  className={`text-xs px-3 py-1 rounded ${
                     item.available
                       ? 'bg-emerald-500/20 text-emerald-500'
                       : 'bg-red-500/20 text-red-500'
@@ -205,20 +237,32 @@ export default function MenuPage() {
                 >
                   {item.available ? 'Disponible' : 'No disponible'}
                 </button>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openModal(item)}
-                    className="text-zinc-500 hover:text-white"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => deleteItem(item.id)}
-                    className="text-red-500 hover:text-red-400"
-                  >
-                    Eliminar
-                  </button>
-                </div>
+                <button
+                  onClick={() => toggleFeatured(item)}
+                  className={`text-xs px-3 py-1 rounded ${
+                    item.featured
+                      ? 'bg-yellow-500/20 text-yellow-500'
+                      : 'bg-zinc-800 text-zinc-500 hover:text-zinc-300'
+                  }`}
+                >
+                  {item.featured ? '⭐ En Home' : '☆ Mostrar en Home'}
+                </button>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800">
+                <button
+                  onClick={() => openModal(item)}
+                  className="text-zinc-500 hover:text-white text-sm"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => deleteItem(item.id)}
+                  className="text-red-500 hover:text-red-400 text-sm"
+                >
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}
@@ -276,15 +320,29 @@ export default function MenuPage() {
                   step="0.01"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="available"
-                  checked={formData.available}
-                  onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
-                  className="w-4 h-4"
-                />
-                <label htmlFor="available" className="text-zinc-400">Disponible</label>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="available"
+                    checked={formData.available}
+                    onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
+                    className="w-4 h-4"
+                  />
+                  <label htmlFor="available" className="text-zinc-400">Disponible</label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="featured"
+                    checked={formData.featured}
+                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                    className="w-4 h-4"
+                  />
+                  <label htmlFor="featured" className="text-zinc-400 flex items-center gap-1">
+                    <span>⭐</span> Mostrar en Home
+                  </label>
+                </div>
               </div>
               <div className="flex gap-4 pt-4">
                 <button

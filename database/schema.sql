@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
   price DECIMAL(10,2) NOT NULL,
   image_url TEXT,
   available BOOLEAN DEFAULT true,
+  featured BOOLEAN DEFAULT false,
   sort_order INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -46,6 +47,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
 -- Index for menu queries
 CREATE INDEX IF NOT EXISTS idx_menu_category ON menu_items(category);
 CREATE INDEX IF NOT EXISTS idx_menu_available ON menu_items(available);
+CREATE INDEX IF NOT EXISTS idx_menu_featured ON menu_items(featured);
 
 -- =============================================
 -- EVENTS / DJS TABLE
@@ -67,6 +69,24 @@ CREATE TABLE IF NOT EXISTS events (
 -- Index for event queries
 CREATE INDEX IF NOT EXISTS idx_events_date ON events(event_date);
 CREATE INDEX IF NOT EXISTS idx_events_featured ON events(featured);
+
+-- =============================================
+-- HERO IMAGES TABLE (max 4 images for homepage)
+-- =============================================
+CREATE TABLE IF NOT EXISTS hero_images (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  image_url TEXT NOT NULL,
+  order_index INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for hero images
+CREATE INDEX IF NOT EXISTS idx_hero_order ON hero_images(order_index);
+
+-- RLS for hero_images
+ALTER TABLE hero_images ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read hero images" ON hero_images FOR SELECT USING (true);
+CREATE POLICY "Service role full access hero" ON hero_images FOR ALL USING (auth.role() = 'service_role');
 
 -- =============================================
 -- GALLERY TABLE

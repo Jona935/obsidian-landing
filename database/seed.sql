@@ -23,70 +23,70 @@ INSERT INTO events (dj_name, event_date, event_time, genre, image_url, spotify_u
 -- =============================================
 -- MENÚ - CÓCTELES
 -- =============================================
-INSERT INTO menu_items (category, name, description, price, available) VALUES
-('cocktails', 'Obsidian Noir', 'Vodka premium, licor de mora, jugo de limón, espuma de carbón activado', 180, true),
-('cocktails', 'Midnight Martini', 'Gin Hendricks, vermouth seco, aceitunas negras, twist de limón', 160, true),
-('cocktails', 'Shadow Kiss', 'Ron añejo, maracuyá fresco, albahaca, soda de jengibre', 150, true),
-('cocktails', 'Dark Negroni', 'Gin, Campari, vermouth rojo, naranja deshidratada', 170, true),
-('cocktails', 'Velvet Night', 'Tequila reposado, licor de café, crema irlandesa, espresso', 165, true),
-('cocktails', 'Electric Blue', 'Vodka, curaçao azul, jugo de limón, Red Bull', 155, true),
-('cocktails', 'Smoky Old Fashioned', 'Bourbon, jarabe de maple ahumado, angostura, naranja', 190, true),
-('cocktails', 'Tropical Noir', 'Ron blanco, piña, coco, jugo de limón, carbón activado', 145, true),
-('cocktails', 'Espresso Martini', 'Vodka, Kahlúa, espresso fresco, jarabe simple', 160, true),
-('cocktails', 'Mojito Obsidian', 'Ron blanco, hierbabuena, limón, soda, toque de mora', 140, true);
+INSERT INTO menu_items (category, name, description, price, available, featured) VALUES
+('cocktails', 'Obsidian Noir', 'Vodka premium, licor de mora, jugo de limón, espuma de carbón activado', 180, true, true),
+('cocktails', 'Midnight Martini', 'Gin Hendricks, vermouth seco, aceitunas negras, twist de limón', 160, true, false),
+('cocktails', 'Shadow Kiss', 'Ron añejo, maracuyá fresco, albahaca, soda de jengibre', 150, true, false),
+('cocktails', 'Dark Negroni', 'Gin, Campari, vermouth rojo, naranja deshidratada', 170, true, true),
+('cocktails', 'Velvet Night', 'Tequila reposado, licor de café, crema irlandesa, espresso', 165, true, false),
+('cocktails', 'Electric Blue', 'Vodka, curaçao azul, jugo de limón, Red Bull', 155, true, false),
+('cocktails', 'Smoky Old Fashioned', 'Bourbon, jarabe de maple ahumado, angostura, naranja', 190, true, true),
+('cocktails', 'Tropical Noir', 'Ron blanco, piña, coco, jugo de limón, carbón activado', 145, true, false),
+('cocktails', 'Espresso Martini', 'Vodka, Kahlúa, espresso fresco, jarabe simple', 160, true, false),
+('cocktails', 'Mojito Obsidian', 'Ron blanco, hierbabuena, limón, soda, toque de mora', 140, true, false);
 
 -- =============================================
 -- MENÚ - SHOTS
 -- =============================================
-INSERT INTO menu_items (category, name, description, price, available) VALUES
-('shots', 'Black Diamond', 'Tequila blanco, licor de café, toque de crema', 90, true),
-('shots', 'Dark Matter', 'Mezcal joven, chamoy, tamarindo, sal de gusano', 85, true),
-('shots', 'Jägerbomb', 'Jägermeister con Red Bull', 95, true),
-('shots', 'Kamikaze', 'Vodka, triple sec, jugo de limón', 80, true),
-('shots', 'Tequila Premium', 'Don Julio Blanco', 100, true),
-('shots', 'B-52', 'Kahlúa, Baileys, Grand Marnier en capas', 95, true),
-('shots', 'Fireball', 'Whisky de canela', 75, true),
-('shots', 'Lemon Drop', 'Vodka cítrico, limón, azúcar', 80, true);
+INSERT INTO menu_items (category, name, description, price, available, featured) VALUES
+('shots', 'Black Diamond', 'Tequila blanco, licor de café, toque de crema', 90, true, true),
+('shots', 'Dark Matter', 'Mezcal joven, chamoy, tamarindo, sal de gusano', 85, true, false),
+('shots', 'Jägerbomb', 'Jägermeister con Red Bull', 95, true, false),
+('shots', 'Kamikaze', 'Vodka, triple sec, jugo de limón', 80, true, false),
+('shots', 'Tequila Premium', 'Don Julio Blanco', 100, true, false),
+('shots', 'B-52', 'Kahlúa, Baileys, Grand Marnier en capas', 95, true, false),
+('shots', 'Fireball', 'Whisky de canela', 75, true, false),
+('shots', 'Lemon Drop', 'Vodka cítrico, limón, azúcar', 80, true, false);
 
 -- =============================================
 -- MENÚ - BOTELLAS
 -- =============================================
-INSERT INTO menu_items (category, name, description, price, available) VALUES
-('bottles', 'Grey Goose', 'Vodka francés premium 750ml', 2500, true),
-('bottles', 'Belvedere', 'Vodka polaco premium 750ml', 2800, true),
-('bottles', 'Don Julio 70', 'Tequila añejo cristalino 750ml', 3200, true),
-('bottles', 'Don Julio 1942', 'Tequila añejo premium 750ml', 6500, true),
-('bottles', 'Clase Azul Reposado', 'Tequila ultra premium 750ml', 8500, true),
-('bottles', 'Moët & Chandon', 'Champagne Brut Imperial 750ml', 4500, true),
-('bottles', 'Veuve Clicquot', 'Champagne Yellow Label 750ml', 5200, true),
-('bottles', 'Dom Pérignon', 'Champagne vintage 750ml', 12000, true),
-('bottles', 'Johnnie Walker Black', 'Whisky escocés 12 años 750ml', 2200, true),
-('bottles', 'Buchanan''s 18', 'Whisky escocés 18 años 750ml', 3800, true),
-('bottles', 'Hennessy VS', 'Cognac francés 750ml', 2800, true),
-('bottles', 'Bombay Sapphire', 'Gin inglés premium 750ml', 1800, true);
+INSERT INTO menu_items (category, name, description, price, available, featured) VALUES
+('bottles', 'Grey Goose', 'Vodka francés premium 750ml', 2500, true, false),
+('bottles', 'Belvedere', 'Vodka polaco premium 750ml', 2800, true, false),
+('bottles', 'Don Julio 70', 'Tequila añejo cristalino 750ml', 3200, true, false),
+('bottles', 'Don Julio 1942', 'Tequila añejo premium 750ml', 6500, true, true),
+('bottles', 'Clase Azul Reposado', 'Tequila ultra premium 750ml', 8500, true, false),
+('bottles', 'Moët & Chandon', 'Champagne Brut Imperial 750ml', 4500, true, true),
+('bottles', 'Veuve Clicquot', 'Champagne Yellow Label 750ml', 5200, true, false),
+('bottles', 'Dom Pérignon', 'Champagne vintage 750ml', 12000, true, false),
+('bottles', 'Johnnie Walker Black', 'Whisky escocés 12 años 750ml', 2200, true, false),
+('bottles', 'Buchanan''s 18', 'Whisky escocés 18 años 750ml', 3800, true, false),
+('bottles', 'Hennessy VS', 'Cognac francés 750ml', 2800, true, false),
+('bottles', 'Bombay Sapphire', 'Gin inglés premium 750ml', 1800, true, false);
 
 -- =============================================
 -- MENÚ - COMIDA
 -- =============================================
-INSERT INTO menu_items (category, name, description, price, available) VALUES
-('food', 'Tabla de Quesos', 'Selección de quesos premium con nueces y mermelada', 350, true),
-('food', 'Nachos Supreme', 'Totopos con queso, guacamole, pico de gallo, jalapeños', 220, true),
-('food', 'Alitas BBQ', '12 piezas de alitas con salsa BBQ ahumada', 280, true),
-('food', 'Sliders Premium', '4 mini hamburguesas de res Angus con queso', 320, true),
-('food', 'Tabla de Carnes Frías', 'Jamón serrano, salami, chorizo español', 420, true),
-('food', 'Guacamole Fresco', 'Preparado al momento con totopos', 180, true),
-('food', 'Papas Gourmet', 'Papas fritas con trufa y parmesano', 200, true),
-('food', 'Ceviche de Camarón', 'Camarón fresco con aguacate y tostadas', 290, true);
+INSERT INTO menu_items (category, name, description, price, available, featured) VALUES
+('food', 'Tabla de Quesos', 'Selección de quesos premium con nueces y mermelada', 350, true, false),
+('food', 'Nachos Supreme', 'Totopos con queso, guacamole, pico de gallo, jalapeños', 220, true, false),
+('food', 'Alitas BBQ', '12 piezas de alitas con salsa BBQ ahumada', 280, true, false),
+('food', 'Sliders Premium', '4 mini hamburguesas de res Angus con queso', 320, true, false),
+('food', 'Tabla de Carnes Frías', 'Jamón serrano, salami, chorizo español', 420, true, false),
+('food', 'Guacamole Fresco', 'Preparado al momento con totopos', 180, true, false),
+('food', 'Papas Gourmet', 'Papas fritas con trufa y parmesano', 200, true, false),
+('food', 'Ceviche de Camarón', 'Camarón fresco con aguacate y tostadas', 290, true, false);
 
 -- =============================================
 -- MENÚ - ESPECIALES
 -- =============================================
-INSERT INTO menu_items (category, name, description, price, available) VALUES
-('specials', 'Torre de Shots', '10 shots variados para compartir', 750, true),
-('specials', 'Bucket de Cervezas', '6 cervezas premium en hielo', 450, true),
-('specials', 'Combo VIP', 'Botella Grey Goose + 10 Red Bull + snacks', 3500, true),
-('specials', 'Paquete Cumpleañero', 'Botella Don Julio 70 + sparklers + postre', 4200, true),
-('specials', 'Experiencia Obsidian', '2 botellas premium + mesa VIP + snacks premium', 8000, true);
+INSERT INTO menu_items (category, name, description, price, available, featured) VALUES
+('specials', 'Torre de Shots', '10 shots variados para compartir', 750, true, false),
+('specials', 'Bucket de Cervezas', '6 cervezas premium en hielo', 450, true, false),
+('specials', 'Combo VIP', 'Botella Grey Goose + 10 Red Bull + snacks', 3500, true, false),
+('specials', 'Paquete Cumpleañero', 'Botella Don Julio 70 + sparklers + postre', 4200, true, false),
+('specials', 'Experiencia Obsidian', '2 botellas premium + mesa VIP + snacks premium', 8000, true, true);
 
 -- =============================================
 -- RESERVACIONES DE PRUEBA
@@ -104,6 +104,15 @@ INSERT INTO reservations (name, email, phone, date, time, guests, table_type, no
 ('Fernando López', 'fer.lopez@email.com', '8668887777', '2026-02-21', '22:00', 6, 'vip', NULL, 'cancelled'),
 ('Alejandra Díaz', 'ale.diaz@email.com', '8661112222', '2026-02-22', '23:00', 5, 'general', NULL, 'pending'),
 ('Juan Pablo Núñez', 'jp.nunez@email.com', '8664445555', '2026-02-28', '22:00', 8, 'booth', 'Cumpleaños 30', 'confirmed');
+
+-- =============================================
+-- HERO IMAGES (4 images for homepage)
+-- =============================================
+INSERT INTO hero_images (image_url, order_index) VALUES
+('https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?w=400', 0),
+('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400', 1),
+('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400', 2),
+('https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=400', 3);
 
 -- =============================================
 -- VERIFICAR DATOS INSERTADOS

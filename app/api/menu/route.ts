@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
     const available = searchParams.get('available');
+    const featured = searchParams.get('featured');
 
     let query = supabase
       .from('menu_items')
@@ -27,7 +28,34 @@ export async function GET(req: NextRequest) {
       query = query.eq('available', true);
     }
 
-    const { data, error } = await query;
+    if (featured === 'true') {
+      query = query.eq('featured', true);
+    }
+
+    let { data, error } = await query;
+
+    // If error occurs (possibly because 'featured' column doesn't exist),
+    // retry without the featured filter
+    if (error && featured === 'true') {
+      console.warn('Featured filter failed, retrying without it:', error.message);
+      let retryQuery = supabase
+        .from('menu_items')
+        .select('*')
+        .order('category')
+        .order('name');
+
+      if (category) {
+        retryQuery = retryQuery.eq('category', category);
+      }
+
+      if (available === 'true') {
+        retryQuery = retryQuery.eq('available', true);
+      }
+
+      const retryResult = await retryQuery;
+      data = retryResult.data;
+      error = retryResult.error;
+    }
 
     if (error) {
       console.error('Supabase Error:', error);
@@ -45,7 +73,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { category, name, description, price, image_url, available } = body;
+    const { category, name, description, price, image_url, available, featured } = body;
 
     if (!category || !name || price === undefined) {
       return NextResponse.json({ error: 'Categoría, nombre y precio son requeridos' }, { status: 400 });
@@ -59,7 +87,8 @@ export async function POST(req: NextRequest) {
         description: description || null,
         price,
         image_url: image_url || null,
-        available: available !== false
+        available: available !== false,
+        featured: featured || false
       }])
       .select()
       .single();
