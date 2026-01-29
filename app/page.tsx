@@ -16,12 +16,15 @@ interface Message {
 
 interface Event {
   id: string;
+  title: string;
+  subtitle: string | null;
   dj_name: string;
   event_date: string;
   event_time: string;
   genre: string;
   image_url: string | null;
   spotify_url: string | null;
+  promotion: string | null;
   featured: boolean;
 }
 
@@ -34,10 +37,13 @@ interface MenuItem {
   featured: boolean;
 }
 
+// Logo URL
+const LOGO_URL = 'https://tdgwgxsmprjdlaaorkpm.supabase.co/storage/v1/object/public/imgs/WhatsApp_Image_2026-01-28_at_22.37.15-removebg-preview.png';
+
 // Loading Screen - Fully Responsive and Centered
 const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
   useEffect(() => {
-    const timer = setTimeout(onComplete, 2500);
+    const timer = setTimeout(onComplete, 2800);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
@@ -47,30 +53,70 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8, ease: 'easeInOut' }}
     >
-      <div className="text-center w-full max-w-lg flex flex-col items-center">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-radial from-brand-red/10 via-transparent to-transparent" />
+
+      {/* Animated corner accents */}
+      <motion.div
+        className="absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-brand-gold/30"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.3 }}
+      />
+      <motion.div
+        className="absolute bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-brand-gold/30"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.3 }}
+      />
+
+      <div className="relative text-center w-full max-w-lg flex flex-col items-center">
+        {/* Logo with animation */}
+        <motion.div
+          initial={{ scale: 0, rotate: -180, opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          transition={{ duration: 1, ease: [0.34, 1.56, 0.64, 1] }}
+          className="mb-4"
+        >
+          <motion.img
+            src={LOGO_URL}
+            alt="Obsidian Social Club"
+            className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 object-contain"
+            animate={{
+              filter: ['drop-shadow(0 0 20px rgba(196,30,58,0.5))', 'drop-shadow(0 0 50px rgba(196,30,58,0.8))', 'drop-shadow(0 0 20px rgba(196,30,58,0.5))']
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </motion.div>
+
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
           className="mb-8 flex flex-col items-center"
         >
-          {/* Compensate letter-spacing with negative margin-right equal to tracking */}
+          {/* OBSIDIAN text with gradient */}
           <motion.h1
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] text-white mr-[0.15em] sm:mr-[0.2em] md:mr-[0.3em]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.3 }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] text-center bg-gradient-to-r from-white via-brand-gold to-white bg-clip-text text-transparent"
+            style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
           >
             OBSIDIAN
           </motion.h1>
+
+          {/* Animated red line */}
           <motion.div
-            className="h-[1px] bg-white mt-4 w-48 sm:w-56 md:w-64 lg:w-72"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
+            className="h-[2px] bg-gradient-to-r from-transparent via-brand-red to-transparent mt-4 w-48 sm:w-56 md:w-64 lg:w-72"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
             transition={{ duration: 1, delay: 0.8 }}
           />
+
+          {/* SOCIAL CLUB with gold color */}
           <motion.p
-            className="text-zinc-500 tracking-[0.3em] sm:tracking-[0.4em] md:tracking-[0.5em] text-xs sm:text-sm mt-4 mr-[0.3em] sm:mr-[0.4em] md:mr-[0.5em]"
+            className="text-brand-gold tracking-[0.3em] sm:tracking-[0.4em] md:tracking-[0.5em] text-xs sm:text-sm mt-4 text-center"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1.2 }}
@@ -78,8 +124,10 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
             SOCIAL CLUB
           </motion.p>
         </motion.div>
+
+        {/* Loading dots with brand colors */}
         <motion.div
-          className="flex justify-center gap-1"
+          className="flex justify-center gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
@@ -87,8 +135,14 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
           {[0, 1, 2].map((i) => (
             <motion.div
               key={i}
-              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"
-              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+              className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${i === 1 ? 'bg-brand-gold' : 'bg-brand-red'}`}
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.5, 1, 0.5],
+                boxShadow: i === 1
+                  ? ['0 0 5px rgba(212,175,55,0.3)', '0 0 15px rgba(212,175,55,0.6)', '0 0 5px rgba(212,175,55,0.3)']
+                  : ['0 0 5px rgba(196,30,58,0.3)', '0 0 15px rgba(196,30,58,0.6)', '0 0 5px rgba(196,30,58,0.3)']
+              }}
               transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
             />
           ))}
@@ -151,10 +205,9 @@ const MagneticButton = ({ children, className = '', onClick, href }: { children:
 };
 
 // Chatbot Component
-const Chatbot = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const Chatbot = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (open: boolean) => void }) => {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: '¡Bienvenido a Obsidian Social Club! Soy tu asistente virtual. Puedo ayudarte con:\n\n• Reservaciones de mesa\n• Información de próximos DJs\n• Nuestro menú de bebidas\n• Horarios y ubicación\n\n¿En qué puedo ayudarte?' }
+    { role: 'assistant', content: '¡Hola! 🖤 Bienvenido a Obsidian Social Club.\n\n¿Qué te gustaría hacer?\n\n📅 Reservar mesa\n🎵 Ver próximos eventos y DJs\n🍸 Ver menú de bebidas\n\nEscríbeme y te ayudo con lo que necesites.' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -264,22 +317,127 @@ const Chatbot = () => {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
-              {messages.map((msg, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`max-w-[85%] sm:max-w-[80%] px-3 sm:px-4 py-2 sm:py-3 rounded-2xl ${
-                    msg.role === 'user'
-                      ? 'bg-white text-black rounded-br-sm'
-                      : 'bg-zinc-900 text-zinc-300 rounded-bl-sm'
-                  }`}>
-                    <p className="text-xs sm:text-sm whitespace-pre-wrap">{msg.content}</p>
-                  </div>
-                </motion.div>
-              ))}
+              {messages.map((msg, i) => {
+                // Check for special markers
+                const hasMenuButton = msg.content.includes('[MENU_BUTTON]');
+
+                // Extract event cards
+                const eventCardRegex = /\[EVENT_CARD\]([\s\S]*?)\[\/EVENT_CARD\]/g;
+                const eventCards: any[] = [];
+                let match;
+                while ((match = eventCardRegex.exec(msg.content)) !== null) {
+                  try {
+                    eventCards.push(JSON.parse(match[1]));
+                  } catch (e) {
+                    console.error('Error parsing event card:', e);
+                  }
+                }
+
+                // Clean content (remove markers)
+                let cleanContent = msg.content
+                  .replace(/\[MENU_BUTTON\]/g, '')
+                  .replace(/\[EVENT_CARD\][\s\S]*?\[\/EVENT_CARD\]/g, '')
+                  .trim();
+
+                // Format date helper
+                const formatCardDate = (dateStr: string) => {
+                  const date = new Date(dateStr + 'T12:00:00');
+                  return date.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
+                };
+
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`max-w-[90%] sm:max-w-[85%] ${
+                      msg.role === 'user'
+                        ? 'bg-white text-black px-3 sm:px-4 py-2 sm:py-3 rounded-2xl rounded-br-sm'
+                        : ''
+                    }`}>
+                      {/* Text content */}
+                      {cleanContent && (
+                        <div className={`${msg.role === 'assistant' ? 'bg-zinc-900 text-zinc-300 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl rounded-bl-sm mb-2' : ''}`}>
+                          <p className="text-xs sm:text-sm whitespace-pre-wrap">{cleanContent}</p>
+                        </div>
+                      )}
+
+                      {/* Event Cards */}
+                      {eventCards.length > 0 && (
+                        <div className="space-y-2 mt-2">
+                          {eventCards.map((event, idx) => (
+                            <div key={idx} className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+                              {/* Event Image */}
+                              {event.image_url && (
+                                <div className="relative h-28 sm:h-32">
+                                  <img
+                                    src={event.image_url}
+                                    alt={event.title || event.dj_name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent" />
+                                  {/* Date badge on image */}
+                                  <div className="absolute top-2 right-2 bg-brand-gold text-black text-[10px] font-bold px-2 py-1 rounded">
+                                    {formatCardDate(event.event_date)}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Event Info */}
+                              <div className="p-3">
+                                <h4 className="text-white font-bold text-sm mb-1">{event.title || event.dj_name}</h4>
+                                <p className="text-brand-red text-xs mb-1">DJ: {event.dj_name}</p>
+                                {event.genre && (
+                                  <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-2">{event.genre}</p>
+                                )}
+
+                                {/* Promotion */}
+                                {event.promotion && (
+                                  <div className="bg-brand-red/20 border border-brand-red/30 px-2 py-1 rounded text-[10px] text-brand-red mb-2">
+                                    🔥 {event.promotion}
+                                  </div>
+                                )}
+
+                                {/* Spotify Button */}
+                                {event.spotify_url && (
+                                  <a
+                                    href={event.spotify_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 bg-[#1DB954] text-white text-xs font-medium px-3 py-2 rounded-lg hover:bg-[#1ed760] transition-colors"
+                                  >
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                                    </svg>
+                                    Escuchar en Spotify
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Menu PDF Button */}
+                      {hasMenuButton && (
+                        <a
+                          href="/menu"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 flex items-center justify-center gap-2 bg-white text-black px-4 py-2 rounded-lg text-xs font-medium hover:bg-zinc-200 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          Ver Menú Completo
+                        </a>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-zinc-900 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl rounded-bl-sm">
@@ -429,11 +587,14 @@ export default function ObsidianLanding() {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', date: '', time: '22:00', guests: 2, tableType: 'general', notes: ''
+    name: '', phone: '', date: '', guests: 2
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [heroMousePosition, setHeroMousePosition] = useState({ x: 0, y: 0 });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [chatbotOpen, setChatbotOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -469,11 +630,16 @@ export default function ObsidianLanding() {
       const response = await fetch('/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          email: formData.phone + '@whatsapp.com', // placeholder email
+          time: '22:00',
+          tableType: 'general'
+        }),
       });
       if (response.ok) {
         setSubmitSuccess(true);
-        setFormData({ name: '', email: '', phone: '', date: '', time: '22:00', guests: 2, tableType: 'general', notes: '' });
+        setFormData({ name: '', phone: '', date: '', guests: 2 });
       }
     } catch (error) {
       console.error('Error:', error);
@@ -483,7 +649,8 @@ export default function ObsidianLanding() {
   };
 
   const formatEventDate = (dateStr: string) => {
-    const date = new Date(dateStr);
+    // Agregar T12:00:00 para evitar problemas de zona horaria
+    const date = new Date(dateStr + 'T12:00:00');
     return {
       day: date.getDate(),
       month: date.toLocaleDateString('es-MX', { month: 'short' }).toUpperCase(),
@@ -503,16 +670,19 @@ export default function ObsidianLanding() {
           initial={{ y: -100 }}
           animate={{ y: loading ? -100 : 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="fixed top-0 left-0 right-0 z-40 mix-blend-difference"
+          className="fixed top-0 left-0 right-0 z-40 bg-black/80 backdrop-blur-md"
         >
-          <div className="max-w-[1800px] mx-auto px-8 md:px-16 py-6 flex items-center justify-between">
+          <div className="max-w-[1800px] mx-auto px-4 sm:px-8 md:px-16 py-4 sm:py-6 flex items-center justify-between">
             <motion.a
               href="#"
-              className="text-white text-xl font-serif tracking-[0.2em]"
+              className="flex items-center gap-2"
               whileHover={{ scale: 1.05 }}
             >
-              OBSIDIAN
+              <img src={LOGO_URL} alt="Obsidian" className="h-7 sm:h-8 md:h-10 w-auto" />
+              <span className="text-white text-base sm:text-lg md:text-xl tracking-[0.1em] sm:tracking-[0.15em]" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>OBSIDIAN</span>
             </motion.a>
+
+            {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-12 text-xs tracking-[0.2em]">
               <motion.a
                 href="#eventos"
@@ -539,8 +709,88 @@ export default function ObsidianLanding() {
                 <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full" />
               </motion.a>
             </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden text-white p-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </motion.nav>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 md:hidden"
+            >
+              <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" />
+              <div className="relative h-full flex flex-col items-center justify-center gap-8">
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="absolute top-4 right-4 text-white p-2"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Logo in mobile menu */}
+                <motion.div
+                  className="flex items-center gap-3 mb-4"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.05 }}
+                >
+                  <img src={LOGO_URL} alt="Obsidian" className="h-16 w-auto" />
+                  <span className="text-white text-2xl tracking-[0.15em]" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>OBSIDIAN</span>
+                </motion.div>
+
+                <motion.a
+                  href="#eventos"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-white text-2xl tracking-[0.2em] font-serif"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  EVENTOS
+                </motion.a>
+                <motion.a
+                  href="/menu"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-white text-2xl tracking-[0.2em] font-serif"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  MENÚ
+                </motion.a>
+                <motion.a
+                  href="#reservar"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-white text-2xl tracking-[0.2em] font-serif"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  RESERVAR
+                </motion.a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Hero Section */}
         <section
@@ -576,61 +826,118 @@ export default function ObsidianLanding() {
               animate={{ opacity: loading ? 0 : 1, y: loading ? 30 : 0 }}
               transition={{ duration: 1, delay: 0.5 }}
             >
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-serif leading-none tracking-[0.05em] sm:tracking-[0.08em] md:tracking-[0.1em] mb-2 sm:mb-4">
+              {/* Logo with hover animation */}
+              <motion.img
+                src={LOGO_URL}
+                alt="Obsidian Social Club"
+                className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 object-contain mx-auto mb-2"
+                whileHover={{ scale: 1.05, rotate: 5, transition: { duration: 0.3 } }}
+                animate={{
+                  filter: [
+                    'drop-shadow(0 0 15px rgba(196,30,58,0.3))',
+                    'drop-shadow(0 0 35px rgba(196,30,58,0.6))',
+                    'drop-shadow(0 0 15px rgba(196,30,58,0.3))'
+                  ]
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: [0.4, 0, 0.6, 1],
+                  times: [0, 0.5, 1]
+                }}
+              />
+              {/* OBSIDIAN text */}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-none tracking-[0.05em] sm:tracking-[0.08em] md:tracking-[0.1em] mb-2 sm:mb-4" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
                 OBSIDIAN
               </h1>
               <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
-                <span className="w-8 sm:w-12 md:w-16 h-[1px] bg-white/50" />
-                <span className="text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] md:tracking-[0.4em] text-zinc-400">SOCIAL CLUB</span>
-                <span className="w-8 sm:w-12 md:w-16 h-[1px] bg-white/50" />
+                <span className="w-8 sm:w-12 md:w-16 h-[1px] bg-brand-red/60" />
+                <span className="text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] md:tracking-[0.4em] text-brand-gold font-display">SOCIAL CLUB</span>
+                <span className="w-8 sm:w-12 md:w-16 h-[1px] bg-brand-red/60" />
               </div>
+
+              {/* CTA Button - Reservar */}
+              <motion.button
+                onClick={() => setChatbotOpen(true)}
+                className="relative mt-6 sm:mt-8 px-8 sm:px-12 py-3 sm:py-4 bg-brand-red text-white font-barlow font-semibold tracking-[0.15em] sm:tracking-[0.2em] text-sm sm:text-base hover:bg-brand-red-light transition-all duration-300 rounded-full overflow-hidden group"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                animate={{
+                  boxShadow: [
+                    '0 0 20px rgba(196,30,58,0.4)',
+                    '0 0 40px rgba(196,30,58,0.7)',
+                    '0 0 20px rgba(196,30,58,0.4)'
+                  ]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                {/* Shine effect */}
+                <motion.span
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full"
+                  animate={{ translateX: ['−100%', '200%'] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                />
+                <span className="relative z-10 flex items-center gap-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  RESERVAR AHORA
+                </span>
+              </motion.button>
 
               {/* Floating Images below title */}
               <FloatingImages mousePosition={heroMousePosition} />
 
-              <p className="text-zinc-500 text-xs sm:text-sm md:text-base tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] mt-8 sm:mt-10 md:mt-12 max-w-lg mx-auto px-4">
-                DONDE LA NOCHE COBRA VIDA
+              <p className="text-zinc-500 text-xs sm:text-sm md:text-base tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.3em] mt-6 sm:mt-8 max-w-lg mx-auto px-4">
+                MONCLOVA, COAH.
               </p>
             </motion.div>
           </motion.div>
 
-          {/* Scroll Indicator */}
+          {/* Scroll Indicator - Left side */}
           <motion.div
-            className="absolute bottom-6 sm:bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20"
+            className="absolute bottom-8 left-4 sm:left-8 z-20 flex items-center gap-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: loading ? 0 : 1 }}
             transition={{ delay: 1.5 }}
           >
             <motion.div
               animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="flex flex-col items-center gap-2"
+              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              className="flex items-center gap-2 bg-brand-red/20 backdrop-blur-sm px-3 py-2 rounded-full border border-brand-red/40"
             >
-              <span className="text-[8px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] text-zinc-600">SCROLL</span>
-              <div className="w-[1px] h-8 sm:h-10 md:h-12 bg-gradient-to-b from-zinc-600 to-transparent" />
+              <svg className="w-4 h-4 text-brand-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+              <span className="text-[10px] sm:text-xs tracking-[0.15em] text-white font-barlow font-medium">SCROLL</span>
             </motion.div>
           </motion.div>
         </section>
 
         {/* Events Section */}
-        <AnimatedSection className="py-32 px-8 md:px-16 bg-black" id="eventos">
+        <AnimatedSection className="py-16 sm:py-24 md:py-32 px-4 sm:px-8 md:px-16 bg-black" id="eventos">
           <div className="max-w-[1800px] mx-auto">
             <motion.div
-              className="flex flex-col md:flex-row md:items-end md:justify-between mb-16"
+              className="flex flex-col md:flex-row md:items-end md:justify-between mb-8 sm:mb-12 md:mb-16"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
             >
               <div>
-                <span className="text-zinc-600 text-xs tracking-[0.3em] block mb-4">PRÓXIMOS EVENTOS</span>
-                <h2 className="text-5xl md:text-7xl font-serif">LINE UP</h2>
+                <span className="text-brand-red text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] block mb-2 sm:mb-4 font-barlow font-medium">PRÓXIMOS EVENTOS</span>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display text-white mb-2">LINE UP</h2>
+                <p className="text-brand-gold font-script text-xl sm:text-2xl">El ritual continúa</p>
               </div>
-              <p className="text-zinc-500 text-sm max-w-md mt-6 md:mt-0 leading-relaxed">
-                Los mejores artistas de la escena electrónica internacional en un solo lugar.
+              <p className="text-zinc-500 text-xs sm:text-sm max-w-md mt-4 md:mt-0 leading-relaxed font-barlow">
+                Los mejores artistas de la escena electrónica. No seguimos tendencias, seguimos la vibra.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {upcomingEvents.length > 0 ? (
                 upcomingEvents.map((event, index) => {
                   const date = formatEventDate(event.event_date);
@@ -642,6 +949,7 @@ export default function ObsidianLanding() {
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1 }}
                       className="group relative aspect-[3/4] overflow-hidden cursor-pointer"
+                      onClick={() => setSelectedEvent(event)}
                     >
                       {/* Image */}
                       <motion.div
@@ -667,49 +975,81 @@ export default function ObsidianLanding() {
 
                       {/* Content */}
                       <div className="absolute inset-0 p-4 sm:p-6 flex flex-col justify-between">
-                        {/* Date - with mix-blend for contrast on any image */}
-                        <div className="self-end text-right mix-blend-difference">
-                          <span className="block text-3xl sm:text-4xl font-serif text-white">{date.day}</span>
-                          <span className="text-[10px] sm:text-xs tracking-[0.2em] text-white">{date.month}</span>
+                        {/* Top: Date badge + Title + Subtitle */}
+                        <div>
+                          {/* Date badge - Top right corner */}
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex-1">
+                              {/* Title - Display font, impactful */}
+                              <motion.h3
+                                className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-white tracking-wide mb-1"
+                                initial={{ y: 20, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                viewport={{ once: true }}
+                              >
+                                {event.title || event.dj_name}
+                              </motion.h3>
+
+                              {/* Subtitle - Script font for emotion */}
+                              {event.subtitle && (
+                                <p className="font-script text-brand-gold text-lg sm:text-xl">{event.subtitle}</p>
+                              )}
+                            </div>
+
+                            {/* Date - Top right */}
+                            <div className="text-right bg-black/60 backdrop-blur-sm px-3 py-2 rounded-lg border border-brand-gold/30">
+                              <span className="block text-3xl sm:text-4xl font-display font-bold text-brand-gold leading-none">{date.day}</span>
+                              <span className="text-[10px] sm:text-xs tracking-[0.15em] text-brand-gold/80 font-barlow uppercase">{date.month}</span>
+                            </div>
+                          </div>
                         </div>
 
-                        {/* Info */}
+                        {/* Bottom: DJ, Genre, Promotion, Spotify */}
                         <div>
-                          <motion.h3
-                            className="text-xl sm:text-2xl md:text-3xl font-medium mb-1 sm:mb-2"
-                            initial={{ y: 20, opacity: 0 }}
-                            whileInView={{ y: 0, opacity: 1 }}
-                            viewport={{ once: true }}
-                          >
-                            {event.dj_name}
-                          </motion.h3>
-                          <p className="text-zinc-500 text-xs sm:text-sm tracking-wider">{event.genre}</p>
+                          {/* DJ Name - Barlow, featured */}
+                          <p className="text-white/90 text-sm sm:text-base font-barlow font-medium mb-1">
+                            <span className="text-brand-red">DJ:</span> {event.dj_name}
+                          </p>
 
+                          {/* Genre */}
+                          <p className="text-zinc-500 text-xs sm:text-sm tracking-wider font-barlow uppercase mb-2">{event.genre}</p>
+
+                          {/* Promotion - if exists */}
+                          {event.promotion && (
+                            <div className="bg-brand-red/20 border border-brand-red/40 px-3 py-1.5 rounded-sm mb-2 inline-block">
+                              <p className="text-brand-red text-[10px] sm:text-xs font-barlow font-medium tracking-wide">
+                                🔥 {event.promotion}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Spotify Link */}
                           {event.spotify_url && (
                             <motion.a
                               href={event.spotify_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 mt-2 sm:mt-3 text-emerald-400 text-[10px] sm:text-xs tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-2 mt-1 text-brand-gold text-[10px] sm:text-xs tracking-wider font-barlow opacity-70 group-hover:opacity-100 transition-opacity duration-300"
                               whileHover={{ x: 5 }}
                             >
                               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
                               </svg>
-                              ESCUCHAR
+                              ESCUCHAR EN SPOTIFY
                             </motion.a>
                           )}
                         </div>
                       </div>
 
                       {/* Border Animation */}
-                      <div className="absolute inset-0 border border-white/0 group-hover:border-white/20 transition-colors duration-500" />
+                      <div className="absolute inset-0 border border-brand-red/0 group-hover:border-brand-red/40 transition-colors duration-500" />
                     </motion.div>
                   );
                 })
               ) : (
-                <div className="col-span-3 text-center py-20 text-zinc-600">
-                  <p className="text-lg">Próximamente anunciaremos nuevos eventos</p>
+                <div className="col-span-full text-center py-12 sm:py-20 text-zinc-600">
+                  <p className="text-base sm:text-lg">Próximamente anunciaremos nuevos eventos</p>
                 </div>
               )}
             </div>
@@ -717,14 +1057,14 @@ export default function ObsidianLanding() {
         </AnimatedSection>
 
         {/* Marquee Divider */}
-        <div className="py-8 border-y border-zinc-900 overflow-hidden">
+        <div className="py-8 border-y border-brand-red/20 overflow-hidden">
           <motion.div
             animate={{ x: [0, -1000] }}
             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
             className="flex gap-8 whitespace-nowrap"
           >
             {Array(10).fill(null).map((_, i) => (
-              <span key={i} className="text-zinc-800 text-sm tracking-[0.5em]">
+              <span key={i} className="text-brand-red/30 text-sm tracking-[0.5em] font-barlow">
                 TECHNO • HOUSE • ELECTRONIC • UNDERGROUND • OBSIDIAN •
               </span>
             ))}
@@ -732,20 +1072,20 @@ export default function ObsidianLanding() {
         </div>
 
         {/* Menu Section */}
-        <AnimatedSection className="py-32 px-8 md:px-16 bg-zinc-950" id="menu">
+        <AnimatedSection className="py-16 sm:py-24 md:py-32 px-4 sm:px-8 md:px-16 bg-zinc-950" id="menu">
           <div className="max-w-[1800px] mx-auto">
-            <div className="grid md:grid-cols-2 gap-16 items-start">
+            <div className="grid md:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-start">
               {/* Left - Title & Description */}
-              <div className="sticky top-32">
-                <span className="text-zinc-600 text-xs tracking-[0.3em] block mb-4">NUESTRA CARTA</span>
-                <h2 className="text-5xl md:text-7xl font-serif mb-8">MENÚ</h2>
-                <p className="text-zinc-500 leading-relaxed mb-8 max-w-md">
+              <div className="md:sticky md:top-32">
+                <span className="text-brand-red text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] block mb-2 sm:mb-4 font-barlow font-medium">NUESTRA CARTA</span>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display text-white mb-4 sm:mb-6 md:mb-8">MENÚ</h2>
+                <p className="text-zinc-500 text-sm sm:text-base leading-relaxed mb-6 sm:mb-8 max-w-md font-barlow">
                   Descubre nuestra selección de cócteles signature, shots especiales y botellas premium.
                   Cada bebida está cuidadosamente elaborada para complementar tu experiencia.
                 </p>
                 <a
                   href="/menu"
-                  className="inline-flex items-center gap-3 text-white text-xs tracking-[0.2em] group hover:text-zinc-300 transition-colors"
+                  className="inline-flex items-center gap-2 sm:gap-3 text-brand-red text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] group hover:text-brand-red-light transition-colors font-barlow font-semibold"
                 >
                   VER MENÚ COMPLETO
                   <span className="inline-block group-hover:translate-x-1 transition-transform">→</span>
@@ -756,8 +1096,8 @@ export default function ObsidianLanding() {
               <div className="space-y-12">
                 {/* Featured Items */}
                 <div>
-                  <h3 className="text-xs tracking-[0.3em] text-zinc-600 mb-6 pb-2 border-b border-zinc-800 flex items-center gap-2">
-                    <span className="text-yellow-500">⭐</span> DESTACADOS
+                  <h3 className="text-xs tracking-[0.3em] text-brand-gold mb-6 pb-2 border-b border-brand-gold/30 flex items-center gap-2 font-barlow">
+                    <span className="text-brand-gold">⭐</span> DESTACADOS
                   </h3>
                   <div className="space-y-6">
                     {(menuItems.length > 0 ? menuItems.slice(0, 6) : [
@@ -776,7 +1116,7 @@ export default function ObsidianLanding() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h4 className="text-white font-medium group-hover:text-zinc-300 transition-colors">{item.name}</h4>
-                            {item.featured && <span className="text-yellow-500 text-sm">⭐</span>}
+                            {item.featured && <span className="text-brand-gold text-sm">⭐</span>}
                           </div>
                           <p className="text-zinc-600 text-sm">{item.description}</p>
                           <span className="text-zinc-700 text-xs uppercase tracking-wider">{
@@ -798,11 +1138,11 @@ export default function ObsidianLanding() {
         </AnimatedSection>
 
         {/* Reservation Section */}
-        <AnimatedSection className="py-32 px-8 md:px-16 bg-black" id="reservar">
+        <AnimatedSection className="py-16 sm:py-24 md:py-32 px-4 sm:px-8 md:px-16 bg-black" id="reservar">
           <div className="max-w-[1200px] mx-auto">
-            <div className="text-center mb-16">
-              <span className="text-zinc-600 text-xs tracking-[0.3em] block mb-4">ASEGURA TU LUGAR</span>
-              <h2 className="text-5xl md:text-7xl font-serif">RESERVAR</h2>
+            <div className="text-center mb-8 sm:mb-12 md:mb-16">
+              <span className="text-brand-red text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] block mb-2 sm:mb-4 font-barlow font-medium">ASEGURA TU LUGAR</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display text-white">RESERVAR</h2>
             </div>
 
             <AnimatePresence mode="wait">
@@ -811,22 +1151,22 @@ export default function ObsidianLanding() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="text-center py-20 border border-zinc-800"
+                  className="text-center py-20 border border-brand-red/30"
                 >
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="w-20 h-20 border border-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8"
+                    className="w-20 h-20 border border-brand-gold rounded-full flex items-center justify-center mx-auto mb-8"
                   >
-                    <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
                     </svg>
                   </motion.div>
-                  <h3 className="text-2xl font-serif mb-4">Reservación Enviada</h3>
-                  <p className="text-zinc-500 mb-8">Te contactaremos para confirmar.</p>
+                  <h3 className="text-2xl font-display text-brand-gold mb-4">RESERVACIÓN ENVIADA</h3>
+                  <p className="text-zinc-500 mb-8 font-barlow">Te contactaremos por WhatsApp para confirmar.</p>
                   <button
                     onClick={() => setSubmitSuccess(false)}
-                    className="text-xs tracking-[0.2em] text-zinc-400 hover:text-white transition-colors"
+                    className="text-xs tracking-[0.2em] text-brand-red hover:text-brand-red-light transition-colors font-barlow"
                   >
                     NUEVA RESERVACIÓN
                   </button>
@@ -836,112 +1176,63 @@ export default function ObsidianLanding() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   onSubmit={handleReservation}
-                  className="border border-zinc-800 p-8 md:p-12"
+                  className="border border-brand-red/30 p-4 sm:p-6 md:p-8 lg:p-12 max-w-2xl mx-auto"
                 >
-                  <div className="grid md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
                     <div>
-                      <label className="block text-xs tracking-[0.2em] text-zinc-500 mb-3">NOMBRE</label>
+                      <label className="block text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-zinc-500 mb-2 sm:mb-3">NOMBRE</label>
                       <input
                         type="text"
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full bg-transparent border-b border-zinc-800 py-3 text-white focus:outline-none focus:border-white transition-colors"
+                        placeholder="Tu nombre"
+                        className="w-full bg-transparent border-b border-zinc-800 py-2.5 sm:py-3 text-sm sm:text-base text-white focus:outline-none focus:border-brand-red transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs tracking-[0.2em] text-zinc-500 mb-3">EMAIL</label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full bg-transparent border-b border-zinc-800 py-3 text-white focus:outline-none focus:border-white transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs tracking-[0.2em] text-zinc-500 mb-3">TELÉFONO</label>
+                      <label className="block text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-zinc-500 mb-2 sm:mb-3">WHATSAPP</label>
                       <input
                         type="tel"
                         required
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full bg-transparent border-b border-zinc-800 py-3 text-white focus:outline-none focus:border-white transition-colors"
+                        placeholder="Ej: 866 123 4567"
+                        className="w-full bg-transparent border-b border-zinc-800 py-2.5 sm:py-3 text-sm sm:text-base text-white focus:outline-none focus:border-brand-red transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs tracking-[0.2em] text-zinc-500 mb-3">PERSONAS</label>
+                      <label className="block text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-zinc-500 mb-2 sm:mb-3">PERSONAS</label>
                       <select
                         value={formData.guests}
                         onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) })}
-                        className="w-full bg-transparent border-b border-zinc-800 py-3 text-white focus:outline-none focus:border-white transition-colors"
+                        className="w-full bg-transparent border-b border-zinc-800 py-2.5 sm:py-3 text-sm sm:text-base text-white focus:outline-none focus:border-brand-red transition-colors"
                       >
-                        {[2, 3, 4, 5, 6, 8, 10, 12, 15, 20].map(n => (
-                          <option key={n} value={n} className="bg-black">{n} personas</option>
+                        {[1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20].map(n => (
+                          <option key={n} value={n} className="bg-black">{n} {n === 1 ? 'persona' : 'personas'}</option>
                         ))}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs tracking-[0.2em] text-zinc-500 mb-3">FECHA</label>
+                      <label className="block text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-zinc-500 mb-2 sm:mb-3">FECHA</label>
                       <input
                         type="date"
                         required
                         value={formData.date}
                         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        className="w-full bg-transparent border-b border-zinc-800 py-3 text-white focus:outline-none focus:border-white transition-colors"
+                        className="w-full bg-transparent border-b border-zinc-800 py-2.5 sm:py-3 text-sm sm:text-base text-white focus:outline-none focus:border-brand-red transition-colors"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-xs tracking-[0.2em] text-zinc-500 mb-3">HORA</label>
-                      <select
-                        value={formData.time}
-                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                        className="w-full bg-transparent border-b border-zinc-800 py-3 text-white focus:outline-none focus:border-white transition-colors"
-                      >
-                        <option value="21:00" className="bg-black">9:00 PM</option>
-                        <option value="22:00" className="bg-black">10:00 PM</option>
-                        <option value="23:00" className="bg-black">11:00 PM</option>
-                        <option value="00:00" className="bg-black">12:00 AM</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Table Type */}
-                  <div className="mt-12">
-                    <label className="block text-xs tracking-[0.2em] text-zinc-500 mb-6">TIPO DE MESA</label>
-                    <div className="grid grid-cols-3 gap-4">
-                      {[
-                        { id: 'general', name: 'GENERAL', price: 'Sin mínimo' },
-                        { id: 'vip', name: 'VIP', price: 'Mín. $3,000' },
-                        { id: 'booth', name: 'BOOTH', price: 'Mín. $8,000' },
-                      ].map((table) => (
-                        <motion.button
-                          key={table.id}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, tableType: table.id })}
-                          className={`p-6 border text-center transition-all ${
-                            formData.tableType === table.id
-                              ? 'border-white bg-white/5'
-                              : 'border-zinc-800 hover:border-zinc-600'
-                          }`}
-                          whileHover={{ y: -2 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <p className="text-xs tracking-[0.2em] mb-2">{table.name}</p>
-                          <p className="text-zinc-500 text-xs">{table.price}</p>
-                        </motion.button>
-                      ))}
                     </div>
                   </div>
 
                   <motion.button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full mt-12 py-5 bg-white text-black text-xs tracking-[0.2em] hover:bg-zinc-200 transition-colors disabled:opacity-50"
+                    className="w-full mt-6 sm:mt-8 md:mt-10 py-3.5 sm:py-4 md:py-5 bg-brand-red text-white text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] hover:bg-brand-red-light transition-colors disabled:opacity-50 font-barlow font-semibold"
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                   >
-                    {isSubmitting ? 'ENVIANDO...' : 'CONFIRMAR RESERVACIÓN'}
+                    {isSubmitting ? 'ENVIANDO...' : 'RESERVAR MESA'}
                   </motion.button>
                 </motion.form>
               )}
@@ -950,33 +1241,36 @@ export default function ObsidianLanding() {
         </AnimatedSection>
 
         {/* Footer */}
-        <footer className="py-16 px-8 md:px-16 border-t border-zinc-900">
+        <footer className="py-10 sm:py-12 md:py-16 px-4 sm:px-8 md:px-16 border-t border-brand-red/20">
           <div className="max-w-[1800px] mx-auto">
-            <div className="grid md:grid-cols-4 gap-12 mb-16">
-              <div>
-                <h3 className="font-serif text-2xl mb-6">OBSIDIAN</h3>
-                <p className="text-zinc-600 text-sm leading-relaxed">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12 mb-8 sm:mb-12 md:mb-16">
+              <div className="col-span-2 sm:col-span-1">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <img src={LOGO_URL} alt="Obsidian" className="h-8 sm:h-10 md:h-12 w-auto" />
+                  <span className="text-lg sm:text-xl md:text-2xl tracking-wider" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>OBSIDIAN</span>
+                </div>
+                <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
                   Donde la noche cobra vida. La experiencia premium de Monclova.
                 </p>
               </div>
               <div>
-                <h4 className="text-xs tracking-[0.2em] text-zinc-500 mb-4">UBICACIÓN</h4>
-                <p className="text-zinc-400 text-sm">Av. Principal #123</p>
-                <p className="text-zinc-600 text-sm">Centro, Monclova, Coahuila</p>
+                <h4 className="text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-brand-red mb-2 sm:mb-4 font-barlow">UBICACIÓN</h4>
+                <p className="text-zinc-400 text-xs sm:text-sm">Av. Principal #123</p>
+                <p className="text-zinc-600 text-xs sm:text-sm">Centro, Monclova, Coahuila</p>
               </div>
               <div>
-                <h4 className="text-xs tracking-[0.2em] text-zinc-500 mb-4">HORARIOS</h4>
-                <p className="text-zinc-400 text-sm">Viernes & Sábado</p>
-                <p className="text-zinc-600 text-sm">10:00 PM - 4:00 AM</p>
+                <h4 className="text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-brand-red mb-2 sm:mb-4 font-barlow">HORARIOS</h4>
+                <p className="text-zinc-400 text-xs sm:text-sm">Viernes & Sábado</p>
+                <p className="text-zinc-600 text-xs sm:text-sm">10:00 PM - 4:00 AM</p>
               </div>
               <div>
-                <h4 className="text-xs tracking-[0.2em] text-zinc-500 mb-4">SÍGUENOS</h4>
-                <div className="flex gap-4">
+                <h4 className="text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-brand-red mb-2 sm:mb-4 font-barlow">SÍGUENOS</h4>
+                <div className="flex gap-3 sm:gap-4">
                   {['IG', 'TW', 'SP'].map((social) => (
                     <motion.a
                       key={social}
                       href="#"
-                      className="w-10 h-10 border border-zinc-800 flex items-center justify-center text-xs text-zinc-500 hover:border-white hover:text-white transition-colors"
+                      className="w-8 h-8 sm:w-10 sm:h-10 border border-zinc-800 flex items-center justify-center text-[10px] sm:text-xs text-zinc-500 hover:border-white hover:text-white transition-colors"
                       whileHover={{ y: -2 }}
                     >
                       {social}
@@ -985,15 +1279,140 @@ export default function ObsidianLanding() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-zinc-900">
-              <p className="text-zinc-700 text-xs">© 2026 OBSIDIAN SOCIAL CLUB</p>
-              <p className="text-zinc-800 text-xs mt-4 md:mt-0">MONCLOVA, COAHUILA, MX</p>
+            <div className="flex flex-col sm:flex-row items-center justify-between pt-6 sm:pt-8 border-t border-zinc-900 gap-2 sm:gap-0">
+              <p className="text-zinc-700 text-[10px] sm:text-xs">© 2026 OBSIDIAN SOCIAL CLUB</p>
+              <p className="text-zinc-800 text-[10px] sm:text-xs">MONCLOVA, COAHUILA, MX</p>
             </div>
           </div>
         </footer>
 
+        {/* Event Modal */}
+        <AnimatePresence>
+          {selectedEvent && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              onClick={() => setSelectedEvent(null)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
+
+              {/* Modal Content */}
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="relative w-full max-w-lg bg-zinc-950 border border-brand-red/30 rounded-lg overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Event Image */}
+                {selectedEvent.image_url && (
+                  <div className="relative h-48 sm:h-56">
+                    <img
+                      src={selectedEvent.image_url}
+                      alt={selectedEvent.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent" />
+                  </div>
+                )}
+
+                {/* Close button */}
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="absolute top-4 right-4 w-10 h-10 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-colors border border-white/20"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Content */}
+                <div className="p-6 sm:p-8">
+                  {/* Date badge */}
+                  <div className="inline-flex items-center gap-2 bg-brand-gold/20 border border-brand-gold/40 px-3 py-1.5 rounded-full mb-4">
+                    <svg className="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-brand-gold text-sm font-barlow font-medium">
+                      {formatEventDate(selectedEvent.event_date).day} {formatEventDate(selectedEvent.event_date).month}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-2xl sm:text-3xl font-display font-bold text-white mb-2">
+                    {selectedEvent.title || selectedEvent.dj_name}
+                  </h3>
+
+                  {/* Subtitle */}
+                  {selectedEvent.subtitle && (
+                    <p className="font-script text-brand-gold text-xl mb-4">{selectedEvent.subtitle}</p>
+                  )}
+
+                  {/* DJ & Genre */}
+                  <div className="flex flex-wrap gap-4 mb-4 text-sm">
+                    <p className="text-white/90 font-barlow">
+                      <span className="text-brand-red">DJ:</span> {selectedEvent.dj_name}
+                    </p>
+                    {selectedEvent.genre && (
+                      <p className="text-zinc-500 font-barlow uppercase tracking-wider">{selectedEvent.genre}</p>
+                    )}
+                  </div>
+
+                  {/* Promotion */}
+                  {selectedEvent.promotion && (
+                    <div className="bg-brand-red/20 border border-brand-red/40 px-4 py-2 rounded-lg mb-6">
+                      <p className="text-brand-red text-sm font-barlow font-medium">
+                        🔥 {selectedEvent.promotion}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <motion.button
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, date: selectedEvent.event_date }));
+                        setSelectedEvent(null);
+                        setChatbotOpen(true);
+                      }}
+                      className="flex-1 py-3 px-6 bg-brand-red text-white font-barlow font-semibold tracking-wider rounded-lg hover:bg-brand-red-light transition-colors flex items-center justify-center gap-2"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      RESERVAR PARA ESTE EVENTO
+                    </motion.button>
+
+                    {selectedEvent.spotify_url && (
+                      <motion.a
+                        href={selectedEvent.spotify_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="py-3 px-6 bg-green-600 text-white font-barlow font-semibold tracking-wider rounded-lg hover:bg-green-500 transition-colors flex items-center justify-center gap-2"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                        </svg>
+                        SPOTIFY
+                      </motion.a>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Chatbot */}
-        <Chatbot />
+        <Chatbot isOpen={chatbotOpen} setIsOpen={setChatbotOpen} />
       </main>
     </>
   );

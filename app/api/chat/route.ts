@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Gemini client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+// Initialize Groq client
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY!,
+});
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -30,15 +32,26 @@ async function buildSystemPrompt(): Promise<string> {
     .order('category')
     .order('name');
 
-  // Format events for the prompt
+  // Format events for the prompt with full details including JSON for EVENT_CARD
   let eventsSection = '';
   if (events && events.length > 0) {
     eventsSection = `### PRÓXIMOS EVENTOS Y DJs:
 ${events.map(e => {
-  const date = new Date(e.event_date);
+  const date = new Date(e.event_date + 'T12:00:00');
   const formattedDate = date.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
-  return `- ${e.dj_name} - ${formattedDate}${e.genre ? ` (${e.genre})` : ''}${e.spotify_url ? ` - Spotify: ${e.spotify_url}` : ''}`;
-}).join('\n')}`;
+  // Create JSON for EVENT_CARD
+  const eventJson = JSON.stringify({
+    title: e.title || e.dj_name,
+    dj_name: e.dj_name,
+    event_date: e.event_date,
+    genre: e.genre || '',
+    image_url: e.image_url || '',
+    spotify_url: e.spotify_url || '',
+    promotion: e.promotion || ''
+  });
+  return `- EVENTO: "${e.title || e.dj_name}" | DJ: ${e.dj_name} | Fecha: ${formattedDate} (${e.event_date})${e.genre ? ` | Género: ${e.genre}` : ''}${e.promotion ? ` | Promoción: ${e.promotion}` : ''}
+  JSON para EVENT_CARD: ${eventJson}`;
+}).join('\n\n')}`;
   } else {
     eventsSection = '### PRÓXIMOS EVENTOS:\nPróximamente anunciaremos nuevos eventos. Mantente atento a nuestras redes sociales.';
   }
@@ -119,12 +132,6 @@ Usa esta fecha como referencia para todas las reservaciones. Cuando el usuario d
 - No se permiten: shorts, sandalias, playeras deportivas, gorras
 - Se recomienda: jeans oscuros, camisas, vestidos, tacones
 
-### Reservaciones:
-- Mesa General: Sin consumo mínimo
-- Mesa VIP: Consumo mínimo $3,000 MXN
-- Booth Privado: Consumo mínimo $8,000 MXN
-- Se requiere reservación con anticipación los fines de semana
-
 ${eventsSection}
 
 ${menuSection}
@@ -132,89 +139,85 @@ ${menuSection}
 ### Edad mínima:
 - 18 años con identificación oficial
 
-## PROCESO DE RESERVACIÓN:
+## CUANDO PREGUNTEN POR EVENTOS:
 
-Cuando el usuario quiera reservar, pide TODOS los datos en UN SOLO mensaje:
-"Para tu reservación necesito:
-1. Nombre completo
-2. Teléfono (con WhatsApp de preferencia)
-3. Fecha (viernes o sábado)
-4. Número de personas
-5. Tipo de mesa: General, VIP ($3,000 min) o Booth ($8,000 min)"
+Cuando el usuario pregunte por eventos, DJs o qué hay próximamente:
+1. Responde con un mensaje breve de introducción
+2. COPIA EXACTAMENTE el JSON que te damos arriba para cada evento y ponlo dentro de [EVENT_CARD]...[/EVENT_CARD]
+3. SIEMPRE invítalos a reservar para esa fecha específica
 
-Cuando el usuario proporcione los datos (pueden venir en uno o varios mensajes), extrae la información. NO preguntes dato por dato, espera a que el usuario te dé la información.
+FORMATO (COPIA el JSON exacto de arriba):
+[EVENT_CARD]<JSON del evento>[/EVENT_CARD]
 
-Cuando tengas TODOS los datos necesarios (nombre, teléfono, fecha, personas, tipo de mesa), confirma los datos Y agrega al FINAL de tu mensaje este bloque JSON exacto:
+Ejemplo de respuesta:
+"¡Estos son nuestros próximos eventos! 🎵
+
+[EVENT_CARD]{"title":"NOCHE OBSCURA","dj_name":"DJ ALMEDA","event_date":"2026-02-07","genre":"Techno","image_url":"https://...","spotify_url":"https://...","promotion":"2x1 en shots"}[/EVENT_CARD]
+
+¿Te gustaría reservar para alguno? 🖤"
+
+REGLAS IMPORTANTES:
+- USA el JSON EXACTO que te damos en la sección de eventos (ya incluye title, dj_name, image_url, etc.)
+- El "title" es el NOMBRE DEL EVENTO (ej: "NOCHE OBSCURA"), NO el nombre del DJ
+- El "dj_name" es el nombre del DJ que toca (ej: "DJ ALMEDA")
+- NO inventes datos, usa SOLO los que te damos arriba
+- Un [EVENT_CARD] por cada evento
+- NUNCA muestres URLs en texto plano
+
+## CUANDO PREGUNTEN POR EL MENÚ:
+
+Cuando el usuario pregunte por el menú, bebidas, carta o precios:
+1. Responde brevemente mencionando algunas opciones destacadas
+2. SIEMPRE incluye el marcador [MENU_BUTTON] para mostrar el botón de descarga
+3. Ejemplo de respuesta:
+"¡Claro! Tenemos cócteles signature como Obsidian Noir ($180), Midnight Martini ($160), shots especiales y botellas premium. 🍸
+
+[MENU_BUTTON]
+
+¿Te gustaría reservar mesa? 🖤"
+
+IMPORTANTE: Siempre usa [MENU_BUTTON] cuando hables del menú, esto mostrará un botón para descargar el PDF.
+
+## PROCESO DE RESERVACIÓN (SIMPLIFICADO):
+
+La reservación solo necesita 4 datos:
+1. Nombre
+2. WhatsApp (teléfono)
+3. Número de personas
+4. Fecha
+
+Cuando el usuario quiera reservar, pide los datos de forma natural:
+"¡Perfecto! Para tu reservación necesito:
+- Tu nombre
+- Tu WhatsApp
+- ¿Cuántas personas serán?
+- ¿Para qué fecha?"
+
+Si el usuario preguntó por un evento específico, SUGIERE esa fecha automáticamente:
+"¿Te hago la reservación para el [fecha del evento] que viene [DJ]? Solo necesito tu nombre, WhatsApp y cuántas personas serán 🖤"
+
+Cuando tengas TODOS los datos (nombre, teléfono, fecha, personas), confirma y agrega:
 
 [RESERVACION_DATA]
-{"name":"nombre","phone":"telefono","date":"YYYY-MM-DD","guests":numero,"tableType":"general|vip|booth"}
+{"name":"nombre","phone":"telefono","date":"YYYY-MM-DD","guests":numero,"tableType":"general"}
 [/RESERVACION_DATA]
 
 IMPORTANTE:
-- Solo genera el bloque [RESERVACION_DATA] UNA SOLA VEZ cuando tengas TODOS los datos completos
-- NUNCA generes el bloque [RESERVACION_DATA] más de una vez en la conversación
-- Si ya generaste el bloque y el usuario confirma o agradece, solo responde amablemente SIN el bloque
+- Solo genera el bloque [RESERVACION_DATA] UNA SOLA VEZ cuando tengas TODOS los datos
+- NUNCA generes el bloque más de una vez en la conversación
 - La fecha debe estar en formato YYYY-MM-DD
-- tableType debe ser exactamente: "general", "vip" o "booth"
+- tableType siempre es "general"
 - guests debe ser un número
-- Si falta algún dato, pide los faltantes en un solo mensaje, no uno por uno
-- NO repitas la solicitud de datos si el usuario ya los proporcionó
+- Si falta algún dato, pídelo de forma natural, no como lista
 
 ## Tus capacidades:
 1. Dar información sobre el club (horarios, ubicación, dress code)
-2. Informar sobre el menú y precios actualizados
-3. Tomar reservaciones completas
-4. Informar sobre próximos eventos y DJs con fechas específicas
-5. Resolver dudas generales
+2. Informar sobre el menú y dirigir a /menu para ver el PDF
+3. Tomar reservaciones (nombre, WhatsApp, personas, fecha)
+4. Informar sobre próximos eventos con fotos, fechas y links
+5. Sugerir fechas de eventos para reservar
 
 Responde siempre de manera útil y mantén la conversación enfocada en ayudar al cliente.`;
-}
-
-// Models to try in order (fallback)
-const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro'];
-
-async function tryWithRetry(
-  genAI: GoogleGenerativeAI,
-  message: string,
-  chatHistory: any[],
-  systemPrompt: string,
-  maxRetries = 3
-): Promise<string> {
-  for (const modelName of MODELS) {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const model = genAI.getGenerativeModel({
-          model: modelName,
-          systemInstruction: systemPrompt,
-        });
-
-        const chat = model.startChat({ history: chatHistory });
-        const result = await chat.sendMessage(message);
-        return result.response.text();
-      } catch (error: any) {
-        const isOverloaded = error?.status === 503 || error?.message?.includes('overloaded');
-        const isNotFound = error?.status === 404;
-
-        if (isNotFound) {
-          console.log(`Model ${modelName} not found, trying next...`);
-          break; // Try next model
-        }
-
-        if (isOverloaded && attempt < maxRetries) {
-          const waitTime = attempt * 1000; // 1s, 2s, 3s
-          console.log(`Model ${modelName} overloaded, retry ${attempt}/${maxRetries} in ${waitTime}ms...`);
-          await new Promise(resolve => setTimeout(resolve, waitTime));
-          continue;
-        }
-
-        if (attempt === maxRetries) {
-          console.log(`Model ${modelName} failed after ${maxRetries} attempts, trying next model...`);
-          break; // Try next model
-        }
-      }
-    }
-  }
-  throw new Error('All models failed');
 }
 
 export async function POST(req: NextRequest) {
@@ -224,27 +227,36 @@ export async function POST(req: NextRequest) {
     // Build dynamic system prompt with events and menu from DB
     const systemPrompt = await buildSystemPrompt();
 
-    // Convert history to Gemini format - skip initial assistant messages
-    let chatHistory = history
+    // Convert history to Groq/OpenAI format
+    const chatHistory = history
       .filter((msg: any) => msg.role === 'user' || msg.role === 'assistant')
       .map((msg: any) => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }],
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
       }));
 
-    // Gemini requires first message to be from user, skip assistant messages at start
-    while (chatHistory.length > 0 && chatHistory[0].role === 'model') {
-      chatHistory = chatHistory.slice(1);
-    }
+    // Add the new user message
+    const messages = [
+      { role: 'system' as const, content: systemPrompt },
+      ...chatHistory,
+      { role: 'user' as const, content: message }
+    ];
 
-    // Try to get response with retries and fallback models
-    const botResponse = await tryWithRetry(genAI, message, chatHistory, systemPrompt);
+    // Call Groq API with Llama 3.3 70B
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 1024,
+    });
+
+    const botResponse = completion.choices[0]?.message?.content || 'Lo siento, no pude procesar tu mensaje.';
 
     return NextResponse.json({ response: botResponse });
   } catch (error) {
     console.error('Chat API Error:', error);
     return NextResponse.json(
-      { response: 'Lo siento, el servicio está ocupado. Por favor intenta en unos segundos.' },
+      { response: 'Lo siento, hubo un error. Por favor intenta de nuevo.' },
       { status: 500 }
     );
   }

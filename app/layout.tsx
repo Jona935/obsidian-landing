@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Inter, Great_Vibes, Raleway, Barlow } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
+const greatVibes = Great_Vibes({ weight: '400', subsets: ['latin'], variable: '--font-script' })
+const raleway = Raleway({ subsets: ['latin'], variable: '--font-display' })
+const barlow = Barlow({ weight: ['400', '500', '600', '700'], subsets: ['latin'], variable: '--font-barlow' })
 
 export const metadata: Metadata = {
   title: 'Obsidian Social Club | Monclova',
@@ -17,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} ${playfair.variable} font-sans`}>
+      <body className={`${inter.variable} ${greatVibes.variable} ${raleway.variable} ${barlow.variable} font-sans`}>
         {children}
       </body>
     </html>

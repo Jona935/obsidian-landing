@@ -6,6 +6,16 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 9, 9, 11;
   --background-end-rgb: 9, 9, 11;
+
+  /* ADN de Marca - Colores */
+  --brand-red: #C41E3A;
+  --brand-red-dark: #8B0000;
+  --brand-red-light: #DC143C;
+  --brand-gold: #D4AF37;
+  --brand-gold-dark: #B8960C;
+  --brand-gold-light: #F4D03F;
+  --brand-black: #0A0A0A;
+  --brand-white: #FAFAFA;
 }
 
 body {
@@ -19,25 +29,76 @@ body {
   min-height: 100vh;
 }
 
-/* Custom scrollbar */
+/* Font families */
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+.font-display {
+  font-family: var(--font-display), sans-serif;
+}
+
+.font-barlow {
+  font-family: var(--font-barlow), sans-serif;
+}
+
+/* Custom scrollbar - Brand Red */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #18181b;
+  background: #0A0A0A;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: var(--brand-red);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: var(--brand-red-light);
 }
 
-/* Selection color */
+/* Selection color - Brand Red */
 ::selection {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(196, 30, 58, 0.4);
+}
+
+/* Gold text gradient */
+.text-gold {
+  background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 50%, #B8960C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gold shimmer effect */
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    #D4AF37 0%,
+    #F4D03F 25%,
+    #D4AF37 50%,
+    #B8960C 75%,
+    #D4AF37 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Red glow effect */
+.red-glow {
+  box-shadow: 0 0 20px rgba(196, 30, 58, 0.4),
+              0 0 40px rgba(196, 30, 58, 0.2);
+}
+
+.red-glow-hover:hover {
+  box-shadow: 0 0 30px rgba(196, 30, 58, 0.6),
+              0 0 60px rgba(196, 30, 58, 0.3);
 }
