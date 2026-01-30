@@ -91,6 +91,13 @@ export default function EventsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validar que la fecha no sea anterior a hoy
+    const today = getTodayDate();
+    if (formData.event_date < today) {
+      alert('No puedes crear eventos en fechas pasadas');
+      return;
+    }
+
     const payload = {
       ...formData,
       ...(editingEvent && { id: editingEvent.id }),
@@ -155,6 +162,12 @@ export default function EventsPage() {
       day: 'numeric',
       month: 'short',
     }).toUpperCase();
+  };
+
+  // Obtener fecha de hoy en formato YYYY-MM-DD
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
   };
 
   return (
@@ -315,9 +328,11 @@ export default function EventsPage() {
                     type="date"
                     value={formData.event_date}
                     onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                    min={getTodayDate()}
                     className="w-full bg-black border border-zinc-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-brand-red"
                     required
                   />
+                  <p className="text-zinc-600 text-xs mt-1">Solo se permiten fechas de hoy en adelante</p>
                 </div>
                 <div>
                   <label className="block text-zinc-500 text-sm mb-2">Hora</label>

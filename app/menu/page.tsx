@@ -13,26 +13,39 @@ interface MenuItem {
   available: boolean;
 }
 
-// Category configuration
-const categories = [
-  { id: 'cocktails', name: 'CÓCTELES', icon: '🍸' },
-  { id: 'shots', name: 'SHOTS', icon: '🥃' },
-  { id: 'bottles', name: 'BOTELLAS', icon: '🍾' },
-  { id: 'food', name: 'COMIDA', icon: '🍽️' },
-  { id: 'specials', name: 'ESPECIALES', icon: '⭐' },
-];
+interface Category {
+  id: string;
+  name: string;
+  display_order: number;
+}
 
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('cocktails');
+  const [activeCategory, setActiveCategory] = useState<string>('');
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch('/api/menu?available=true')
-      .then(res => res.json())
-      .then(data => {
-        setMenuItems(data.items || []);
+    Promise.all([
+      fetch('/api/menu?available=true').then(res => res.json()),
+      fetch('/api/categories').then(res => res.json())
+    ])
+      .then(([menuData, categoriesData]) => {
+        const items = menuData.items || [];
+        const cats = categoriesData.categories || [];
+
+        setMenuItems(items);
+        setCategories(cats);
+
+        // Set first category with items as active
+        const catsWithItems = cats.filter((cat: Category) =>
+          items.some((item: MenuItem) => item.category === cat.id)
+        );
+        if (catsWithItems.length > 0) {
+          setActiveCategory(catsWithItems[0].id);
+        }
+
         setLoading(false);
       })
       .catch(err => {
@@ -44,8 +57,12 @@ export default function MenuPage() {
   const getItemsByCategory = (category: string) =>
     menuItems.filter(item => item.category === category);
 
+  // Filter categories that have items
+  const categoriesWithItems = categories.filter(cat =>
+    menuItems.some(item => item.category === cat.id)
+  );
+
   const handleDownloadPDF = () => {
-    // Create printable content
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
@@ -53,7 +70,7 @@ export default function MenuPage() {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Menú - Obsidian Social Club</title>
+          <title>Menu - Obsidian Social Club</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap');
 
@@ -95,7 +112,7 @@ export default function MenuPage() {
             .category-title {
               font-size: 14px;
               letter-spacing: 0.3em;
-              color: #666;
+              color: #C41E3A;
               margin-bottom: 20px;
               padding-bottom: 10px;
               border-bottom: 1px solid #222;
@@ -130,6 +147,7 @@ export default function MenuPage() {
             .item-price {
               font-weight: 500;
               margin-left: 20px;
+              color: #D4AF37;
             }
 
             .footer {
@@ -143,9 +161,10 @@ export default function MenuPage() {
 
             @media print {
               body { background: #fff; color: #000; }
-              .category-title { color: #333; border-color: #ccc; }
+              .category-title { color: #C41E3A; border-color: #ccc; }
               .item { border-color: #ddd; }
               .item-description { color: #666; }
+              .item-price { color: #8B6914; }
               .footer { color: #999; border-color: #ccc; }
             }
           </style>
@@ -156,19 +175,19 @@ export default function MenuPage() {
             <div class="subtitle">SOCIAL CLUB</div>
           </div>
 
-          ${categories.map(cat => {
+          ${categoriesWithItems.map(cat => {
             const items = menuItems.filter(item => item.category === cat.id);
             if (items.length === 0) return '';
             return `
               <div class="category">
-                <div class="category-title">${cat.name}</div>
+                <div class="category-title">${cat.name.toUpperCase()}</div>
                 ${items.map(item => `
                   <div class="item">
                     <div class="item-info">
                       <div class="item-name">${item.name}</div>
-                      <div class="item-description">${item.description}</div>
+                      ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
                     </div>
-                    <div class="item-price">$${item.price.toLocaleString()}</div>
+                    <div class="item-price">$${item.price}</div>
                   </div>
                 `).join('')}
               </div>
@@ -177,8 +196,8 @@ export default function MenuPage() {
 
           <div class="footer">
             <p>OBSIDIAN SOCIAL CLUB</p>
-            <p>Av. Principal #123, Centro, Monclova, Coahuila</p>
-            <p>Viernes & Sábado • 10:00 PM - 4:00 AM</p>
+            <p>Monclova, Coahuila</p>
+            <p>Viernes y Sabado - 10:00 PM - 4:00 AM</p>
           </div>
 
           <script>
@@ -199,12 +218,12 @@ export default function MenuPage() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-md border-b border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="text-lg sm:text-xl font-serif tracking-[0.2em] text-white hover:text-zinc-300 transition-colors">
+          <Link href="/" className="text-lg sm:text-xl tracking-[0.2em] text-white hover:text-zinc-300 transition-colors" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
             OBSIDIAN
           </Link>
           <motion.button
             onClick={handleDownloadPDF}
-            className="flex items-center gap-2 px-4 py-2 text-xs tracking-[0.1em] border border-zinc-700 text-white hover:border-white hover:bg-white hover:text-black transition-all"
+            className="flex items-center gap-2 px-4 py-2 text-xs tracking-[0.1em] border border-zinc-700 text-white hover:border-brand-red hover:bg-brand-red hover:text-white transition-all"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -223,11 +242,10 @@ export default function MenuPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-zinc-600 text-xs tracking-[0.3em] block mb-4">NUESTRA CARTA</span>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-serif mb-6">MENÚ</h1>
-          <p className="text-zinc-500 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
-            Cócteles signature, shots especiales y botellas premium.
-            Cada bebida elaborada para complementar tu experiencia.
+          <span className="text-brand-red text-xs tracking-[0.3em] block mb-4 font-barlow">NUESTRA CARTA</span>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-display mb-6">MENU</h1>
+          <p className="text-zinc-500 max-w-lg mx-auto text-sm sm:text-base leading-relaxed font-barlow">
+            Bebidas, cocteles y cervezas premium para tu noche perfecta.
           </p>
         </motion.div>
       </section>
@@ -236,17 +254,17 @@ export default function MenuPage() {
       <nav className="sticky top-16 z-30 bg-black/90 backdrop-blur-md border-y border-zinc-900 overflow-x-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="flex gap-1 sm:gap-2 py-2 min-w-max sm:justify-center">
-            {categories.map((cat) => (
+            {categoriesWithItems.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-3 sm:px-6 py-2 sm:py-3 text-[10px] sm:text-xs tracking-[0.1em] sm:tracking-[0.2em] transition-all whitespace-nowrap ${
+                className={`px-3 sm:px-6 py-2 sm:py-3 text-[10px] sm:text-xs tracking-[0.1em] sm:tracking-[0.15em] transition-all whitespace-nowrap font-barlow ${
                   activeCategory === cat.id
-                    ? 'bg-white text-black'
+                    ? 'bg-brand-red text-white'
                     : 'text-zinc-500 hover:text-white'
                 }`}
               >
-                {cat.name}
+                {cat.name.toUpperCase()}
               </button>
             ))}
           </div>
@@ -262,16 +280,16 @@ export default function MenuPage() {
                 {[0, 1, 2].map((i) => (
                   <motion.div
                     key={i}
-                    className="w-2 h-2 bg-white rounded-full"
+                    className="w-2 h-2 bg-brand-red rounded-full"
                     animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
                   />
                 ))}
               </div>
-              <p className="text-zinc-500 text-sm">Cargando menú...</p>
+              <p className="text-zinc-500 text-sm font-barlow">Cargando menu...</p>
             </div>
           ) : (
-            categories.map((cat) => {
+            categoriesWithItems.map((cat) => {
               const items = getItemsByCategory(cat.id);
               if (items.length === 0) return null;
 
@@ -285,31 +303,33 @@ export default function MenuPage() {
                   }}
                   className="mb-16"
                 >
-                  <div className="flex items-center gap-4 mb-8 pb-4 border-b border-zinc-800">
-                    <span className="text-2xl">{cat.icon}</span>
-                    <h2 className="text-xs sm:text-sm tracking-[0.3em] text-zinc-500">{cat.name}</h2>
+                  <div className="flex items-center gap-4 mb-8 pb-4 border-b border-brand-red/30">
+                    <h2 className="text-sm sm:text-base tracking-[0.2em] text-brand-gold font-barlow font-semibold">{cat.name.toUpperCase()}</h2>
+                    <span className="text-zinc-600 text-xs font-barlow">({items.length} items)</span>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {items.map((item, index) => (
                       <motion.div
                         key={item.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="group flex justify-between items-start py-4 border-b border-zinc-900 hover:border-zinc-700 transition-colors"
+                        transition={{ delay: index * 0.03 }}
+                        className="group flex justify-between items-start py-3 border-b border-zinc-900 hover:border-zinc-700 transition-colors"
                       >
                         <div className="flex-1 pr-4">
-                          <h3 className="text-base sm:text-lg font-medium text-white group-hover:text-zinc-300 transition-colors mb-1">
+                          <h3 className="text-base sm:text-lg font-medium text-white group-hover:text-brand-gold transition-colors mb-1">
                             {item.name}
                           </h3>
-                          <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed">
-                            {item.description}
-                          </p>
+                          {item.description && (
+                            <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed font-barlow">
+                              {item.description}
+                            </p>
+                          )}
                         </div>
                         <div className="text-right">
-                          <span className="text-lg sm:text-xl font-medium text-white">
-                            ${item.price.toLocaleString()}
+                          <span className="text-lg sm:text-xl font-semibold text-brand-gold">
+                            ${item.price}
                           </span>
                         </div>
                       </motion.div>
@@ -323,7 +343,7 @@ export default function MenuPage() {
           {/* Empty state */}
           {!loading && menuItems.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-zinc-500">No hay items disponibles</p>
+              <p className="text-zinc-500 font-barlow">No hay items disponibles</p>
             </div>
           )}
         </div>
@@ -332,19 +352,19 @@ export default function MenuPage() {
       {/* Download CTA */}
       <section className="py-16 px-4 sm:px-6 md:px-8 border-t border-zinc-900">
         <div className="max-w-xl mx-auto text-center">
-          <p className="text-zinc-500 text-sm mb-6">
-            Lleva nuestro menú contigo
+          <p className="text-zinc-500 text-sm mb-6 font-barlow">
+            Lleva nuestro menu contigo
           </p>
           <motion.button
             onClick={handleDownloadPDF}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black text-xs tracking-[0.2em] hover:bg-zinc-200 transition-colors"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-brand-red text-white text-xs tracking-[0.2em] hover:bg-brand-red-light transition-colors font-barlow font-semibold"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            DESCARGAR MENÚ EN PDF
+            DESCARGAR MENU EN PDF
           </motion.button>
         </div>
       </section>
@@ -352,10 +372,10 @@ export default function MenuPage() {
       {/* Footer */}
       <footer className="py-12 px-4 sm:px-6 md:px-8 border-t border-zinc-900">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/" className="font-serif text-xl tracking-[0.2em] text-zinc-500 hover:text-white transition-colors">
+          <Link href="/" className="text-xl tracking-[0.2em] text-zinc-500 hover:text-white transition-colors" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
             OBSIDIAN
           </Link>
-          <p className="text-zinc-700 text-xs">© 2026 OBSIDIAN SOCIAL CLUB</p>
+          <p className="text-zinc-700 text-xs font-barlow">2026 OBSIDIAN SOCIAL CLUB</p>
         </div>
       </footer>
     </main>

@@ -132,6 +132,11 @@ Usa esta fecha como referencia para todas las reservaciones. Cuando el usuario d
 - No se permiten: shorts, sandalias, playeras deportivas, gorras
 - Se recomienda: jeans oscuros, camisas, vestidos, tacones
 
+### Redes Sociales:
+- Instagram: @obsidianmva - https://www.instagram.com/obsidianmva/
+- Facebook: https://www.facebook.com/profile.php?id=61581587972708
+Si preguntan por redes sociales, comparte estos links para que nos sigan.
+
 ${eventsSection}
 
 ${menuSection}

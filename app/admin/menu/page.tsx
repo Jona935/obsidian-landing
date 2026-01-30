@@ -13,20 +13,29 @@ interface MenuItem {
   featured: boolean;
 }
 
-const categories = [
-  { id: 'cocktails', label: 'Cócteles' },
-  { id: 'shots', label: 'Shots' },
-  { id: 'bottles', label: 'Botellas' },
-  { id: 'food', label: 'Comida' },
-  { id: 'specials', label: 'Especiales' },
+interface Category {
+  id: string;
+  name: string;
+  display_order: number;
+}
+
+const defaultCategories: Category[] = [
+  { id: 'cocktails', name: 'Cócteles', display_order: 1 },
+  { id: 'shots', name: 'Shots', display_order: 2 },
+  { id: 'bottles', name: 'Botellas', display_order: 3 },
+  { id: 'food', name: 'Comida', display_order: 4 },
+  { id: 'specials', name: 'Especiales', display_order: 5 },
 ];
 
 export default function MenuPage() {
   const [items, setItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>(defaultCategories);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('cocktails');
   const [showModal, setShowModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
     category: 'cocktails',
     name: '',
@@ -36,9 +45,14 @@ export default function MenuPage() {
     available: true,
     featured: false,
   });
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    display_order: 99,
+  });
 
   useEffect(() => {
     fetchItems();
+    fetchCategories();
   }, []);
 
   const fetchItems = async () => {
@@ -50,6 +64,21 @@ export default function MenuPage() {
       console.error('Error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch('/api/categories');
+      const data = await res.json();
+      if (data.categories && data.categories.length > 0) {
+        setCategories(data.categories);
+        if (!data.categories.find((c: Category) => c.id === activeCategory)) {
+          setActiveCategory(data.categories[0].id);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
   };
 
@@ -85,6 +114,28 @@ export default function MenuPage() {
     setEditingItem(null);
   };
 
+  const openCategoryModal = (category?: Category) => {
+    if (category) {
+      setEditingCategory(category);
+      setCategoryFormData({
+        name: category.name,
+        display_order: category.display_order,
+      });
+    } else {
+      setEditingCategory(null);
+      setCategoryFormData({
+        name: '',
+        display_order: categories.length + 1,
+      });
+    }
+    setShowCategoryModal(true);
+  };
+
+  const closeCategoryModal = () => {
+    setShowCategoryModal(false);
+    setEditingCategory(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -104,6 +155,56 @@ export default function MenuPage() {
       if (res.ok) {
         fetchItems();
         closeModal();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch('/api/categories', {
+        method: editingCategory ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...categoryFormData,
+          ...(editingCategory && { id: editingCategory.id }),
+        }),
+      });
+
+      if (res.ok) {
+        fetchCategories();
+        closeCategoryModal();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al guardar la categoría');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const deleteCategory = async (id: string) => {
+    if (!confirm('¿Estás seguro de eliminar esta categoría?')) return;
+
+    try {
+      const res = await fetch('/api/categories', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+
+      if (res.ok) {
+        fetchCategories();
+        if (activeCategory === id && categories.length > 1) {
+          const remaining = categories.filter(c => c.id !== id);
+          setActiveCategory(remaining[0]?.id || 'cocktails');
+        }
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al eliminar la categoría');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -170,28 +271,60 @@ export default function MenuPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-serif text-white">Menú</h1>
-        <button
-          onClick={() => openModal()}
-          className="bg-white text-black px-6 py-2 rounded-lg hover:bg-zinc-200 transition-colors"
-        >
-          + Agregar Item
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => openCategoryModal()}
+            className="bg-brand-gold text-black px-4 py-2 rounded-lg hover:bg-brand-gold-light transition-colors text-sm"
+          >
+            + Categoría
+          </button>
+          <button
+            onClick={() => openModal()}
+            className="bg-white text-black px-6 py-2 rounded-lg hover:bg-zinc-200 transition-colors"
+          >
+            + Agregar Item
+          </button>
+        </div>
       </div>
 
       {/* Category Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 items-center">
         {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
-            className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-              activeCategory === cat.id
-                ? 'bg-white text-black'
-                : 'bg-zinc-900 text-zinc-400 hover:text-white'
-            }`}
-          >
-            {cat.label}
-          </button>
+          <div key={cat.id} className="relative group flex-shrink-0">
+            <button
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                activeCategory === cat.id
+                  ? 'bg-white text-black'
+                  : 'bg-zinc-900 text-zinc-400 hover:text-white'
+              }`}
+            >
+              {cat.name}
+            </button>
+            {/* Edit/Delete buttons on hover */}
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:flex gap-1 bg-zinc-800 rounded-lg p-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openCategoryModal(cat);
+                }}
+                className="text-xs text-zinc-400 hover:text-white px-2 py-1"
+                title="Editar"
+              >
+                ✏️
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteCategory(cat.id);
+                }}
+                className="text-xs text-red-400 hover:text-red-300 px-2 py-1"
+                title="Eliminar"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -269,7 +402,7 @@ export default function MenuPage() {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Item Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 w-full max-w-md">
@@ -285,7 +418,7 @@ export default function MenuPage() {
                   className="w-full bg-black border border-zinc-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-white"
                 >
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.label}</option>
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
               </div>
@@ -357,6 +490,57 @@ export default function MenuPage() {
                   className="flex-1 bg-white text-black py-2 rounded-lg hover:bg-zinc-200 transition-colors"
                 >
                   {editingItem ? 'Guardar' : 'Crear'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Category Modal */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-zinc-900 border border-brand-gold/30 rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl text-white mb-6 flex items-center gap-2">
+              <span className="text-brand-gold">📁</span>
+              {editingCategory ? 'Editar Categoría' : 'Nueva Categoría'}
+            </h2>
+            <form onSubmit={handleCategorySubmit} className="space-y-4">
+              <div>
+                <label className="block text-zinc-500 text-sm mb-2">Nombre de la Categoría</label>
+                <input
+                  type="text"
+                  value={categoryFormData.name}
+                  onChange={(e) => setCategoryFormData({ ...categoryFormData, name: e.target.value })}
+                  className="w-full bg-black border border-zinc-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-brand-gold"
+                  placeholder="Ej: Cervezas, Vinos, etc."
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-zinc-500 text-sm mb-2">Orden de visualización</label>
+                <input
+                  type="number"
+                  value={categoryFormData.display_order}
+                  onChange={(e) => setCategoryFormData({ ...categoryFormData, display_order: parseInt(e.target.value) })}
+                  className="w-full bg-black border border-zinc-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-brand-gold"
+                  min="1"
+                />
+                <p className="text-zinc-600 text-xs mt-1">Número menor = aparece primero</p>
+              </div>
+              <div className="flex gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={closeCategoryModal}
+                  className="flex-1 border border-zinc-700 text-white py-2 rounded-lg hover:border-white transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-brand-gold text-black py-2 rounded-lg hover:bg-brand-gold-light transition-colors font-medium"
+                >
+                  {editingCategory ? 'Guardar' : 'Crear'}
                 </button>
               </div>
             </form>
