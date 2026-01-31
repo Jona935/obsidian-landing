@@ -124,7 +124,7 @@ Usa esta fecha como referencia para todas las reservaciones. Cuando el usuario d
 ## Información del club:
 
 ### Horarios:
-- Viernes y Sábado: 10:00 PM - 2:00 AM
+- Jueves a Sábado: 10:00 PM - 2:00 AM
 - Eventos especiales pueden tener horarios distintos
 
 ### Ubicación:
