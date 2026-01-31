@@ -101,9 +101,8 @@ BOTELLAS:
 - Moët & Chandon - $4,500`;
   }
 
-  // Get current date
-  const now = new Date();
-  const currentDate = now.toLocaleDateString('es-MX', {
+  // Get current date (reuse mexicoTime for consistency)
+  const currentDate = mexicoTime.toLocaleDateString('es-MX', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
