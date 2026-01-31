@@ -128,7 +128,7 @@ Usa esta fecha como referencia para todas las reservaciones. Cuando el usuario d
 - Eventos especiales pueden tener horarios distintos
 
 ### Ubicación:
-- Av. Principal #123, Centro, Monclova, Coahuila
+- Blvd Harold R. Pape 600, Guadalupe, 25750 Monclova, Coah.
 - Estacionamiento disponible
 
 ### Dress Code:

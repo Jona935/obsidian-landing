@@ -196,7 +196,7 @@ export default function MenuPage() {
 
           <div class="footer">
             <p>OBSIDIAN SOCIAL CLUB</p>
-            <p>Monclova, Coahuila</p>
+            <p>Blvd Harold R. Pape 600, Guadalupe, 25750 Monclova, Coah.</p>
             <p>Jueves a Sabado - 10:00 PM - 2:00 AM</p>
           </div>
 

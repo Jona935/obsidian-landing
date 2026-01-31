@@ -1255,8 +1255,8 @@ export default function ObsidianLanding() {
               </div>
               <div>
                 <h4 className="text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-brand-red mb-2 sm:mb-4 font-barlow">UBICACIÓN</h4>
-                <p className="text-zinc-400 text-xs sm:text-sm">Av. Principal #123</p>
-                <p className="text-zinc-600 text-xs sm:text-sm">Centro, Monclova, Coahuila</p>
+                <p className="text-zinc-400 text-xs sm:text-sm">Blvd Harold R. Pape 600</p>
+                <p className="text-zinc-600 text-xs sm:text-sm">Guadalupe, 25750 Monclova, Coah.</p>
               </div>
               <div>
                 <h4 className="text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-brand-red mb-2 sm:mb-4 font-barlow">HORARIOS</h4>
