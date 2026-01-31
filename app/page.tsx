@@ -826,24 +826,26 @@ export default function ObsidianLanding() {
               animate={{ opacity: loading ? 0 : 1, y: loading ? 30 : 0 }}
               transition={{ duration: 1, delay: 0.5 }}
             >
-              {/* Logo with hover animation */}
+              {/* Logo with cursor follow effect */}
               <motion.img
                 src={LOGO_URL}
                 alt="Obsidian Social Club"
                 className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 object-contain mx-auto mb-2"
-                whileHover={{ scale: 1.05, rotate: 5, transition: { duration: 0.3 } }}
+                style={{
+                  filter: 'drop-shadow(0 0 25px rgba(196,30,58,0.5))'
+                }}
+                whileHover={{ scale: 1.05, transition: { duration: 0.3 } }}
                 animate={{
-                  filter: [
-                    'drop-shadow(0 0 15px rgba(196,30,58,0.3))',
-                    'drop-shadow(0 0 35px rgba(196,30,58,0.6))',
-                    'drop-shadow(0 0 15px rgba(196,30,58,0.3))'
-                  ]
+                  x: heroMousePosition.x * 0.03 * 100,
+                  y: heroMousePosition.y * 0.03 * 50,
+                  rotateX: heroMousePosition.y * -5,
+                  rotateY: heroMousePosition.x * 5,
                 }}
                 transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: [0.4, 0, 0.6, 1],
-                  times: [0, 0.5, 1]
+                  type: 'spring',
+                  stiffness: 150,
+                  damping: 15,
+                  mass: 0.5
                 }}
               />
               {/* OBSIDIAN text */}
