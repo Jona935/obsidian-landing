@@ -1261,7 +1261,7 @@ export default function ObsidianLanding() {
               <div>
                 <h4 className="text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-brand-red mb-2 sm:mb-4 font-barlow">HORARIOS</h4>
                 <p className="text-zinc-400 text-xs sm:text-sm">Viernes & Sábado</p>
-                <p className="text-zinc-600 text-xs sm:text-sm">10:00 PM - 4:00 AM</p>
+                <p className="text-zinc-600 text-xs sm:text-sm">10:00 PM - 2:00 AM</p>
               </div>
               <div>
                 <h4 className="text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-brand-red mb-2 sm:mb-4 font-barlow">SIGUENOS</h4>

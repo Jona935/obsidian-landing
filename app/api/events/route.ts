@@ -23,7 +23,12 @@ export async function GET(req: NextRequest) {
     }
 
     if (upcoming === 'true') {
-      const today = new Date().toISOString().split('T')[0];
+      // Use Mexico timezone to get correct "today" date
+      const now = new Date();
+      const mexicoTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Mexico_City' }));
+      const today = mexicoTime.getFullYear() + '-' +
+        String(mexicoTime.getMonth() + 1).padStart(2, '0') + '-' +
+        String(mexicoTime.getDate()).padStart(2, '0');
       query = query.gte('event_date', today);
     }
 

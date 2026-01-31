@@ -15,8 +15,12 @@ const supabase = createClient(
 
 // Function to build dynamic system prompt with events and menu from DB
 async function buildSystemPrompt(): Promise<string> {
-  // Fetch upcoming events
-  const today = new Date().toISOString().split('T')[0];
+  // Fetch upcoming events - use Mexico timezone
+  const now = new Date();
+  const mexicoTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Mexico_City' }));
+  const today = mexicoTime.getFullYear() + '-' +
+    String(mexicoTime.getMonth() + 1).padStart(2, '0') + '-' +
+    String(mexicoTime.getDate()).padStart(2, '0');
   const { data: events } = await supabase
     .from('events')
     .select('*')
@@ -120,7 +124,7 @@ Usa esta fecha como referencia para todas las reservaciones. Cuando el usuario d
 ## Información del club:
 
 ### Horarios:
-- Viernes y Sábado: 10:00 PM - 4:00 AM
+- Viernes y Sábado: 10:00 PM - 2:00 AM
 - Eventos especiales pueden tener horarios distintos
 
 ### Ubicación:
