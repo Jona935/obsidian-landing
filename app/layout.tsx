@@ -30,14 +30,14 @@ export const metadata: Metadata = {
   authors: [{ name: 'Obsidian Social Club' }],
   creator: 'Obsidian Social Club',
   publisher: 'Obsidian Social Club',
-  metadataBase: new URL('https://obsidian-landing.vercel.app'),
+  metadataBase: new URL('https://www.obsidianmva.com'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'es_MX',
-    url: 'https://obsidian-landing.vercel.app',
+    url: 'https://www.obsidianmva.com',
     siteName: 'Obsidian Social Club',
     title: 'Obsidian Social Club | La Discoteca Premium de Monclova',
     description: 'Vive noches únicas con los mejores DJs y ambiente premium. La experiencia nocturna más exclusiva de Monclova, Coahuila.',
@@ -79,7 +79,7 @@ const jsonLd = {
   '@type': 'NightClub',
   name: 'Obsidian Social Club',
   description: 'La discoteca más exclusiva de Monclova, Coahuila. Música electrónica, DJs internacionales y ambiente premium.',
-  url: 'https://obsidian-landing.vercel.app',
+  url: 'https://www.obsidianmva.com',
   telephone: '+52-866-XXX-XXXX',
   address: {
     '@type': 'PostalAddress',
@@ -108,7 +108,7 @@ const jsonLd = {
     'https://www.instagram.com/obsidianmva/',
     'https://www.facebook.com/profile.php?id=61581587972708'
   ],
-  image: 'https://obsidian-landing.vercel.app/og-image.jpg',
+  image: 'https://www.obsidianmva.com/og-image.jpg',
   currenciesAccepted: 'MXN',
   paymentAccepted: 'Cash, Credit Card'
 };

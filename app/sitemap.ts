@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://obsidian-landing.vercel.app'
+  const baseUrl = 'https://www.obsidianmva.com'
 
   return [
     {
